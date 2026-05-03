@@ -5,7 +5,7 @@ export default {
   targets: 'section',
   density: 1,
   apply(el, rng) {
-    const BULLET_SECTIONS = ['experience', 'education', 'projects', 'certifications', 'awards', 'volunteer'];
+    const BULLET_SECTIONS = ['experience', 'education', 'projects', 'certifications', 'awards', 'volunteer', 'freelance'];
     if (!BULLET_SECTIONS.includes(el.dataset.cvSection)) return;
     if (el.classList.contains('fx-numbered-section')) return;
     for (const p of el.querySelectorAll('p')) {

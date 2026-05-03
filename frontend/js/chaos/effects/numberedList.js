@@ -4,7 +4,7 @@
 // checks for this class and skips.
 
 const BULLET_SECTIONS = [
-  'experience', 'education', 'projects', 'certifications', 'awards', 'volunteer',
+  'experience', 'education', 'projects', 'certifications', 'awards', 'volunteer', 'freelance',
 ];
 
 export default {

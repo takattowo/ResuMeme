@@ -7,7 +7,8 @@ KNOWN_HEADINGS: dict[str, list[str]] = {
     "skills": ["skills", "technical skills", "competencies", "core competencies", "key skills", "technologies", "tools", "tech stack"],
     "education": ["education", "academic background", "qualifications", "academic qualifications"],
     "certifications": ["certifications", "certificates", "licenses", "credentials"],
-    "projects": ["projects", "personal projects", "portfolio", "selected projects", "key projects", "side projects"],
+    "projects": ["projects", "personal projects", "personal project", "portfolio", "selected projects", "key projects", "side projects"],
+    "freelance": ["freelance", "freelance work", "freelance experience", "freelance present", "consulting", "consulting experience"],
     "languages": ["languages", "language proficiency", "spoken languages"],
     "awards": ["awards", "honors", "honours", "achievements", "accomplishments"],
     "publications": ["publications", "papers"],
@@ -36,10 +37,14 @@ _HEADING_CHARS = re.compile(r"^[A-Za-z][A-Za-z\s/&\-:]*$")
 
 
 def _is_known_heading(line: str) -> tuple[bool, str, str]:
-    cleaned = line.strip().lower().rstrip(":")
+    text = line.strip().rstrip(":")
+    if not text or len(text) > 50:
+        return False, "", ""
+    cleaned = text.lower()
     for canonical, aliases in KNOWN_HEADINGS.items():
-        if cleaned in aliases:
-            return True, canonical, line.strip().rstrip(":")
+        for alias in aliases:
+            if cleaned == alias:
+                return True, canonical, text
     return False, "", ""
 
 
