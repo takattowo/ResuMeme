@@ -63,7 +63,7 @@ function renderBaseDom(cv) {
   root.appendChild(makeIdentityCard(sections, cv.aiContent && cv.aiContent.identity));
 
   if (cv.aiContent && cv.aiContent.review) {
-    root.appendChild(makeAiReview(cv.aiContent.review));
+    root.appendChild(makeAiReview(cv.aiContent.review, cv.id));
   }
 
   if (items.length) {
@@ -128,14 +128,19 @@ function splitWords(text) {
   return frag;
 }
 
-function makeAiReview(reviewText) {
+const REVIEW_EMOJIS = ['💼', '🚀', '⭐', '🏆', '🔥', '🤝', '🎯', '✨', '💎', '🦾'];
+
+function makeAiReview(reviewText, seedKey) {
   const card = document.createElement('div');
   card.className = 'cv-ai-review';
   card.dataset.cvAiReview = '1';
 
+  const localRng = seededRng((seedKey || '') + ':review');
+  const emoji = pick(localRng, REVIEW_EMOJIS);
+
   const badge = document.createElement('div');
   badge.className = 'cv-ai-review-badge';
-  badge.textContent = '🤖 AI Career Counselor Review™';
+  badge.textContent = `${emoji} Why You Hire This Person™`;
   card.appendChild(badge);
 
   const body = document.createElement('p');

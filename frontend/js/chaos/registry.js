@@ -37,11 +37,17 @@ import emojiBullets from './effects/emojiBullets.js';
 import refsRoast from './effects/refsRoast.js';
 import avatarRotate from './effects/avatarRotate.js';
 import avatarScatter from './effects/avatarScatter.js';
+import avatarPosition from './effects/avatarPosition.js';
 import customCursor from './effects/customCursor.js';
 import sectionWobble from './effects/sectionWobble.js';
+import sectionVariety from './effects/sectionVariety.js';
 import konamiMaxChaos from './effects/konamiMaxChaos.js';
 
 export const EFFECTS = [
+  // Variety/positioning effects run first so later transforms can stack on top.
+  sectionVariety,
+  avatarPosition,
+  // Word/heading transformations.
   zoomPulse,
   randomCaps,
   markHighlight,
@@ -53,23 +59,28 @@ export const EFFECTS = [
   fakeSpellcheck,
   randomRotation,
   strobeHeading,
+  // Layout / skill cloud.
   marqueeBanner,
   tableSection,
   watermark,
   wordCloud,
+  // Floating UI.
   achievementPopup,
   engagementWidget,
   cookieRespawn,
   stuckLoadingBar,
   fakeBadges,
   sparkleScatter,
+  // Section-specific roasts.
   skillsRatings,
   inflatedYears,
   wingdingsContact,
   emojiBullets,
   refsRoast,
+  // Avatar effects (rotate + scatter run after position).
   avatarRotate,
   avatarScatter,
+  // Interactions.
   customCursor,
   sectionWobble,
   konamiMaxChaos,
