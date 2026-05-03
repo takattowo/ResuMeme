@@ -47,17 +47,4 @@ function renderTestimonials() {
   }
 }
 
-function startTrustCounter() {
-  const el = document.getElementById('trust-counter');
-  if (!el) return;
-  let count = 127438;
-  const fmt = (n) => n.toLocaleString('en-US');
-  el.textContent = fmt(count);
-  setInterval(() => {
-    count += 1 + Math.floor(Math.random() * 3);
-    el.textContent = fmt(count);
-  }, 1000);
-}
-
 renderTestimonials();
-startTrustCounter();

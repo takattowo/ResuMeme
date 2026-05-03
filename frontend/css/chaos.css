@@ -377,6 +377,52 @@ body {
 
 .fx-rating { font-size: 0.85em; margin-left: 0.4em; color: #ff8800; }
 
+/* Floating Back-to-Home button (always visible above all chaos). */
+.cv-home-btn {
+  position: fixed;
+  top: 0.85rem;
+  left: 0.85rem;
+  z-index: 500;
+  background: #111;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.5rem 0.95rem;
+  border-radius: 8px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 2px solid #fff;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.35);
+  transition: background 0.15s, transform 0.15s;
+}
+.cv-home-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Precipitation effect: minimal falling particles. */
+.fx-precip-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+  overflow: hidden;
+}
+.fx-precip-drop {
+  position: absolute;
+  top: -10vh;
+  animation: precip-fall linear infinite;
+  will-change: transform;
+}
+@keyframes precip-fall {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(120vh); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fx-precip-container { display: none; }
+}
+
 .fx-numbered-section {
   counter-reset: cv-item;
 }

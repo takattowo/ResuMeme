@@ -18,6 +18,10 @@ import wingdingsFlicker from './effects/wingdingsFlicker.js';
 import fakeSpellcheck from './effects/fakeSpellcheck.js';
 import randomRotation from './effects/randomRotation.js';
 import strobeHeading from './effects/strobeHeading.js';
+import colorShift from './effects/colorShift.js';
+import letterSpread from './effects/letterSpread.js';
+import boldRandom from './effects/boldRandom.js';
+import precipitation from './effects/precipitation.js';
 // import mixedFonts from './effects/mixedFonts.js';     // disabled: destroys readability
 import marqueeBanner from './effects/marqueeBanner.js';
 import tableSection from './effects/tableSection.js';
@@ -69,6 +73,10 @@ export const EFFECTS = [
   fakeSpellcheck,
   randomRotation,
   strobeHeading,
+  colorShift,
+  letterSpread,
+  boldRandom,
+  precipitation,
   // Layout / skill cloud.
   marqueeBanner,
   tableSection,
