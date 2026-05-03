@@ -1,0 +1,12 @@
+name: cvenhancer
+metadata:
+  template: azd-init@1.0.0
+infra:
+  provider: bicep
+  path: infra
+  module: main
+services:
+  web:
+    project: .
+    language: ts
+    host: staticwebapp
