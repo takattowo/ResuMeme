@@ -1,0 +1,146 @@
+import { seededRng, pick } from './rng.js';
+import { applyChaos } from './chaos/orchestrator.js';
+
+const root = document.getElementById('cv-root');
+
+const cvId = (window.location.pathname.match(/\/cv\/([^/]+)/) || [])[1];
+
+if (!cvId) {
+  showFatal('No CV id in URL.');
+} else {
+  load(cvId).catch((err) => showFatal(err.message));
+}
+
+async function load(id) {
+  const resp = await fetch(`/api/cv/${id}`);
+  if (resp.status === 404) {
+    showFatal(
+      'This CV has been so enhanced it ascended to a higher plane. (Or it expired after 30 days.)'
+    );
+    return;
+  }
+  if (!resp.ok) {
+    showFatal('Backend down. Recruiters definitely noticed.');
+    return;
+  }
+  const cv = await resp.json();
+  renderBaseDom(cv);
+  const rng = seededRng(id);
+  const ctx = { cvId: id, rng, cv };
+  applyChaos(rng, ctx);
+  root.removeAttribute('aria-busy');
+}
+
+function showFatal(message) {
+  root.replaceChildren();
+  const p = document.createElement('p');
+  p.className = 'loading';
+  p.textContent = message;
+  root.appendChild(p);
+}
+
+function renderBaseDom(cv) {
+  const sections = cv.sections || {};
+  const hasStructured =
+    sections.summary || sections.experience || sections.skills || sections.education;
+
+  const avatarUrl = (cv.imageUrls || [])[0] || null;
+  const avatarFallback = pick(seededRng(cv.id + ':emoji'), ['🤡', '👽', '💀', '🦄', '👻']);
+
+  root.replaceChildren();
+
+  const avatarEl = document.createElement(avatarUrl ? 'img' : 'div');
+  avatarEl.dataset.cvAvatar = '1';
+  avatarEl.classList.add('cv-avatar');
+  if (avatarUrl) {
+    avatarEl.src = avatarUrl;
+    avatarEl.alt = '';
+  } else {
+    avatarEl.textContent = avatarFallback;
+  }
+  root.appendChild(avatarEl);
+
+  const header = document.createElement('header');
+  header.dataset.cvSection = 'header';
+  if (sections.name) header.appendChild(makeHeading(sections.name, 'name'));
+  if (sections.title) header.appendChild(makeText(sections.title, 'p'));
+  root.appendChild(header);
+
+  if (hasStructured) {
+    appendSection('summary', sections.summary);
+    appendSection('experience', sections.experience);
+    appendSection('skills', sections.skills);
+    appendSection('education', sections.education);
+  } else {
+    appendRawText(sections.raw_text || '');
+  }
+
+  appendActionBar();
+}
+
+function appendSection(name, body) {
+  if (!body) return;
+  const section = document.createElement('section');
+  section.dataset.cvSection = name;
+  section.appendChild(makeHeading(name.toUpperCase(), name));
+  for (const line of body.split('\n')) {
+    if (line.trim()) section.appendChild(makeText(line));
+  }
+  root.appendChild(section);
+}
+
+function appendRawText(text) {
+  const section = document.createElement('section');
+  section.dataset.cvSection = 'raw';
+  for (const line of text.split('\n')) {
+    if (line.trim()) section.appendChild(makeText(line));
+  }
+  root.appendChild(section);
+}
+
+function makeHeading(text, key) {
+  const h = document.createElement('h2');
+  h.dataset.cvHeading = key;
+  h.appendChild(splitWords(text));
+  return h;
+}
+
+function makeText(text, tag = 'p') {
+  const el = document.createElement(tag);
+  el.appendChild(splitWords(text));
+  return el;
+}
+
+function splitWords(text) {
+  const frag = document.createDocumentFragment();
+  const parts = text.split(/(\s+)/);
+  for (const part of parts) {
+    if (/^\s+$/.test(part)) {
+      frag.appendChild(document.createTextNode(part));
+    } else if (part) {
+      const span = document.createElement('span');
+      span.dataset.cvWord = '1';
+      span.textContent = part;
+      frag.appendChild(span);
+    }
+  }
+  return frag;
+}
+
+function appendActionBar() {
+  const bar = document.createElement('div');
+  bar.className = 'cv-actions';
+  bar.dataset.cvSection = 'actions';
+
+  const dl = document.createElement('button');
+  dl.id = 'btn-download';
+  dl.textContent = '✨ Download Enhanced CV ✨';
+  bar.appendChild(dl);
+
+  const sh = document.createElement('button');
+  sh.id = 'btn-share';
+  sh.textContent = '📋 Copy share link';
+  bar.appendChild(sh);
+
+  root.appendChild(bar);
+}

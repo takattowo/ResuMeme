@@ -1,0 +1,83 @@
+:root {
+  --chaos-speed: 1;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Comic Sans MS', 'Comic Neue', cursive;
+  padding: 2rem;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#cv-root {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.25rem;
+  color: #555;
+  font-family: system-ui, sans-serif;
+}
+
+[data-cv-section] {
+  position: relative;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+}
+
+[data-cv-heading] {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+[data-cv-word] {
+  display: inline-block;
+}
+
+.cv-avatar {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 50%;
+  z-index: 100;
+  font-size: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cv-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+  padding: 2rem;
+}
+
+.cv-actions button {
+  padding: 1rem 1.5rem;
+  font-size: 1.125rem;
+  font-family: inherit;
+  cursor: pointer;
+  border: 3px solid #000;
+  border-radius: 8px;
+  background: #ff6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
