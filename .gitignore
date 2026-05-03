@@ -24,6 +24,9 @@ __blobstorage__/
 __queuestorage__/
 AzuriteConfig
 
+# Superpowers spec/plan artifacts (kept locally only, not in public repo)
+docs/superpowers/
+
 # IDEs
 .vscode/
 .idea/
