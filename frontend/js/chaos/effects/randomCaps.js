@@ -2,7 +2,7 @@ import { randInt } from '../../rng.js';
 export default {
   name: 'randomCaps',
   targets: 'word',
-  density: 0.20,
+  density: 0.05,
   apply(el, rng) {
     const text = el.textContent;
     let out = '';

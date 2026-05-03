@@ -5,7 +5,7 @@ export default {
   targets: 'page',
   density: 1,
   apply(_el, rng) {
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 8; i++) {
       const s = document.createElement('span');
       s.className = 'fx-sparkle';
       s.textContent = pick(rng, EMOJI);

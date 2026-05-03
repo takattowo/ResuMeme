@@ -10,7 +10,7 @@ const BADGES = [
 export default {
   name: 'fakeBadges',
   targets: 'section',
-  density: 0.4,
+  density: 0.2,
   apply(el, rng) {
     const badge = document.createElement('span');
     badge.className = 'fx-badge';

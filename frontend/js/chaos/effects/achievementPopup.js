@@ -33,7 +33,7 @@ export default {
     const pool = aiPopups.length ? aiPopups.concat(POOL) : POOL;
 
     const schedule = () => {
-      const ms = randInt(rng, 4000, 7000);
+      const ms = randInt(rng, 8000, 14000);
       setTimeout(() => {
         const popup = document.createElement('div');
         popup.className = 'fx-popup';

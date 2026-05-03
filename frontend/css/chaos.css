@@ -6,10 +6,17 @@
 
 body {
   margin: 0;
-  font-family: 'Comic Sans MS', 'Comic Neue', cursive;
+  font-family: 'Calibri', 'Segoe UI', system-ui, sans-serif;
+  background: #faf7f2;
   padding: 2rem;
   min-height: 100vh;
   overflow-x: hidden;
+  color: #1a1a1a;
+}
+
+#cv-root [data-cv-section] {
+  font-size: 1rem;
+  line-height: 1.55;
 }
 
 #cv-root {
@@ -35,18 +42,17 @@ body {
 }
 
 [data-cv-heading] {
-  margin: 0 0 0.5rem;
-  font-size: 1.5rem;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.9);
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 2px solid #1a1a1a;
+  padding-bottom: 0.25rem;
 }
 
 [data-cv-word] {
   display: inline-block;
-  text-shadow:
-    1px 1px 0 rgba(255, 255, 255, 0.95),
-    -1px -1px 0 rgba(255, 255, 255, 0.95),
-    1px -1px 0 rgba(255, 255, 255, 0.95),
-    -1px 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 /* Identity card — high-contrast spotlight for name + contact info,

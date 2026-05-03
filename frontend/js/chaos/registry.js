@@ -18,11 +18,11 @@ import wingdingsFlicker from './effects/wingdingsFlicker.js';
 import fakeSpellcheck from './effects/fakeSpellcheck.js';
 import randomRotation from './effects/randomRotation.js';
 import strobeHeading from './effects/strobeHeading.js';
-import mixedFonts from './effects/mixedFonts.js';
+// import mixedFonts from './effects/mixedFonts.js';     // disabled — destroys readability
 import marqueeBanner from './effects/marqueeBanner.js';
 import tableSection from './effects/tableSection.js';
 import watermark from './effects/watermark.js';
-import cyclingBg from './effects/cyclingBg.js';
+// import cyclingBg from './effects/cyclingBg.js';        // disabled — dominates the page
 import wordCloud from './effects/wordCloud.js';
 import achievementPopup from './effects/achievementPopup.js';
 import engagementWidget from './effects/engagementWidget.js';
@@ -53,11 +53,9 @@ export const EFFECTS = [
   fakeSpellcheck,
   randomRotation,
   strobeHeading,
-  mixedFonts,
   marqueeBanner,
   tableSection,
   watermark,
-  cyclingBg,
   wordCloud,
   achievementPopup,
   engagementWidget,
