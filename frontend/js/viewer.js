@@ -66,9 +66,11 @@ function renderBaseDom(cv) {
     root.appendChild(makeAiReview(cv.aiContent.review, cv.id));
   }
 
+  const enhanced = (cv.aiContent && cv.aiContent.enhanced) || {};
+
   if (items.length) {
     for (const item of items) {
-      appendSection(item);
+      appendSection(item, enhanced);
     }
   } else {
     appendRawText(sections.raw_text || '');
@@ -77,15 +79,20 @@ function renderBaseDom(cv) {
   appendActionBar();
 }
 
-function appendSection(item) {
-  const body = (item.body || '').trim();
-  if (!body) return;
+function appendSection(item, enhancedMap) {
   const canonical = item.canonical || item.heading.toLowerCase();
+  const aiBullets = enhancedMap && Array.isArray(enhancedMap[canonical])
+    ? enhancedMap[canonical].filter((s) => typeof s === 'string' && s.trim())
+    : [];
+  const fallback = (item.body || '').split('\n').map((s) => s.trim()).filter(Boolean);
+  const lines = aiBullets.length ? aiBullets : fallback;
+  if (!lines.length) return;
+
   const section = document.createElement('section');
   section.dataset.cvSection = canonical;
   section.appendChild(makeHeading(item.heading.toUpperCase(), canonical));
-  for (const line of body.split('\n')) {
-    if (line.trim()) section.appendChild(makeText(line.trim()));
+  for (const line of lines) {
+    section.appendChild(makeText(line));
   }
   root.appendChild(section);
 }

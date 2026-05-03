@@ -1,4 +1,4 @@
-name: cvenhancer
+name: resumee
 metadata:
   template: azd-init@1.0.0
 infra:

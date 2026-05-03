@@ -8,8 +8,8 @@ param location string = resourceGroup().location
 param repositoryUrl string = ''
 
 var token = uniqueString(resourceGroup().id, environmentName)
-var storageName = toLower('cve${environmentName}${take(token, 8)}')
-var swaName = 'swa-cvenhancer-${environmentName}-${take(token, 6)}'
+var storageName = toLower('rsm${environmentName}${take(token, 8)}')
+var swaName = 'swa-resumee-${environmentName}-${take(token, 6)}'
 
 resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageName

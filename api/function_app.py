@@ -69,7 +69,11 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
     sections = split_sections(parsed["raw_text"])
 
     # AI is best-effort. None = fall back to generic frontend content.
-    ai_content = generate_roasts(parsed["raw_text"], sections.get("name", ""))
+    ai_content = generate_roasts(
+        parsed["raw_text"],
+        sections.get("name", ""),
+        sections.get("items", []),
+    )
 
     cv_id = generate_id()
     image_paths: list[str] = []

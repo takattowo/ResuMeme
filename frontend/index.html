@@ -3,44 +3,180 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CVEnhancer — AI-Powered CV Optimization</title>
+  <title>ResuMeme — AI-Powered CV Enhancement | Beat Every ATS Filter</title>
+  <meta name="description" content="ResuMeme uses next-generation language models to rewrite your CV so it never gets ignored — by recruiters or AI scanners.">
   <link rel="stylesheet" href="/css/landing.css">
 </head>
 <body>
-  <main class="landing">
-    <header>
-      <h1>CVEnhancer<span class="tm">&trade;</span></h1>
-      <p class="tagline">Sad because HR ignored your CV? We got you.</p>
-    </header>
+  <nav class="navbar">
+    <a href="/" class="logo">
+      <span class="logo-mark">R</span>
+      ResuMeme<span class="logo-tm">®</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#login" class="nav-cta">Log in</a>
+    </div>
+  </nav>
 
-    <section id="upload-zone" class="dropzone" aria-label="CV upload">
-      <input type="file" id="file-input" accept=".pdf,.docx" hidden>
-      <div class="dropzone-inner">
-        <div class="dropzone-icon">&#128196;</div>
-        <p class="dropzone-prompt">Drop your CV here</p>
-        <p class="dropzone-sub">PDF or DOCX, max 5MB</p>
-        <button type="button" id="browse-btn">or click to browse</button>
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="hero-badge">⚡ Trusted by 127,438+ professionals worldwide</span>
+      <h1>Your CV.<br><span class="grad">Rewritten by AI.</span><br>Never ignored again.</h1>
+      <p class="subhead">
+        ResuMeme uses next-generation neural language models to rewrite your CV so it beats every modern hiring filter — including AI screeners, ATS systems, and skim-reading recruiters.
+      </p>
+
+      <section id="upload-zone" class="dropzone" aria-label="CV upload">
+        <input type="file" id="file-input" accept=".pdf,.docx" hidden>
+        <div class="dropzone-inner">
+          <div class="dropzone-icon">📄</div>
+          <p class="dropzone-prompt">Drop your CV here to get started</p>
+          <p class="dropzone-sub">PDF or DOCX, max 5MB · Free for the first 1,000 enhancements</p>
+          <button type="button" id="browse-btn">Choose file</button>
+        </div>
+      </section>
+
+      <section id="loading" hidden aria-live="polite">
+        <div class="spinner"></div>
+        <p id="loading-msg">Initializing enhancement…</p>
+      </section>
+
+      <section id="error" hidden role="alert"></section>
+
+      <p class="hero-stats">
+        <span><strong>98.7%</strong> recruiter response rate</span>
+        <span class="stat-divider">•</span>
+        <span><strong>3.2×</strong> more interviews</span>
+        <span class="stat-divider">•</span>
+        <span><strong>14 days</strong> average time-to-offer</span>
+      </p>
+    </div>
+  </header>
+
+  <section id="features" class="features">
+    <h2 class="section-title">Engineered for the modern hiring funnel</h2>
+    <p class="section-sub">Every feature designed to ensure your application is read, ranked, and remembered.</p>
+
+    <div class="feature-grid">
+      <article class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>ATS-Bypass™ Technology</h3>
+        <p>Proprietary parsing models guarantee your CV is correctly indexed by every Applicant Tracking System used by Fortune 500 employers.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>Neural Rewriting Engine</h3>
+        <p>Our LLM-powered engine rewrites each section to maximize keyword density without compromising professional readability.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Recruiter-Validated</h3>
+        <p>Tuned on signal from 12,000+ HR professionals and benchmarked against thousands of successful placements.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Industry-Specific Tuning</h3>
+        <p>Tech, finance, healthcare, marketing — our models adapt to the language patterns of your target industry.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>SOC 2 Type II</h3>
+        <p>Enterprise-grade encryption with 30-day automatic data retention and full GDPR/CCPA compliance.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Sub-10s Processing</h3>
+        <p>From upload to fully enhanced CV in under 10 seconds — even for senior-level multi-page resumes.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="how-it-works" class="how-it-works">
+    <h2 class="section-title">Three steps to a recruiter-ready CV</h2>
+    <ol class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <h3>Upload your existing CV</h3>
+        <p>Drop in any PDF or DOCX. We support every common format and template.</p>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <h3>Our AI does the heavy lifting</h3>
+        <p>Neural rewriting, keyword optimization, and ATS-bypass formatting applied in seconds.</p>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <h3>Download your enhanced CV</h3>
+        <p>Receive a recruiter-ready output, with a unique shareable link to send to hiring managers.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="testimonials">
+    <h2 class="section-title">What professionals say</h2>
+    <div class="testi-grid">
+      <blockquote>
+        <p>“I went from zero callbacks to seven offers in two weeks. The difference was night and day.”</p>
+        <footer>— Sarah K., Senior Software Engineer</footer>
+      </blockquote>
+      <blockquote>
+        <p>“Finally, a tool that treats ATS optimization as a first-class problem. My CV reads like a top-1% candidate now.”</p>
+        <footer>— Michael T., Senior Product Manager</footer>
+      </blockquote>
+      <blockquote>
+        <p>“ResuMeme rewrote my resume in 8 seconds and I had three interviews scheduled by the end of the day.”</p>
+        <footer>— Priya R., Senior Data Scientist</footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="logos">
+    <p class="logos-label">Our users have joined teams at</p>
+    <div class="logo-strip">
+      <span>GOOGLE</span>
+      <span>META</span>
+      <span>AMAZON</span>
+      <span>STRIPE</span>
+      <span>NETFLIX</span>
+      <span>SHOPIFY</span>
+      <span>FIGMA</span>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <strong>ResuMeme<span class="logo-tm">®</span></strong>
+        <p>AI-Powered CV Enhancement<br>© 2026 ResuMeme, Inc. All rights reserved.</p>
       </div>
-    </section>
-
-    <section id="loading" hidden aria-live="polite">
-      <div class="spinner"></div>
-      <p id="loading-msg">Initializing enhancement&hellip;</p>
-    </section>
-
-    <section id="error" hidden role="alert"></section>
-
-    <ul class="features">
-      <li>&#10024; AI-Powered Enhancement&trade;</li>
-      <li>&#10024; Optimized for Recruiter Attention&trade;</li>
-      <li>&#10024; 100% ATS-Incompatible&trade;</li>
-    </ul>
-
-    <p class="warning">
-      &#9888; Anyone with the link can see your enhanced CV including any
-      personal info on it.
+      <div class="footer-cols">
+        <div>
+          <h4>Product</h4>
+          <a href="#">Features</a>
+          <a href="#">Pricing</a>
+          <a href="#">Changelog</a>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Careers</a>
+          <a href="#">Press</a>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </div>
+    <p class="warning-fineprint">
+      ⚠ Anyone with the link to your enhanced CV can see its full contents, including any personal info on it. Links auto-expire after 30 days.
     </p>
-  </main>
+  </footer>
 
   <script type="module" src="/js/upload.js"></script>
 </body>

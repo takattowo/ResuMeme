@@ -15,7 +15,7 @@ try:
 except ImportError:
     _SDK_OK = False
 
-_TIMEOUT_SECONDS = 12
+_TIMEOUT_SECONDS = 35
 
 
 def _client():
@@ -41,51 +41,61 @@ def _deployment() -> Optional[str]:
     return os.environ.get("AZURE_OPENAI_DEPLOYMENT")
 
 
-def generate_roasts(text: str, name: str) -> Optional[dict]:
+def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optional[dict]:
     """Generate personalized roast content from a CV.
 
-    Returns dict with keys 'identity' (dict), 'review' (str) and 'popups'
-    (list[str]), or None if AI is unavailable / fails.
+    Returns dict with keys identity (dict), review (str), popups (list[str])
+    and enhanced (dict[str, list[str]]), or None if AI is unavailable / fails.
     """
     client = _client()
     deployment = _deployment()
     if client is None or not deployment:
         return None
 
+    if items:
+        sections_block = "\n\n".join(
+            f"### {it['heading']} (canonical_key: {it['canonical']})\n{it['body']}"
+            for it in items
+        )
+    else:
+        sections_block = f"(no parsed sections; raw text)\n{text[:6000]}"
+
     prompt = (
-        "You are writing for CVEnhancer, a satirical meme site that mocks "
-        "LinkedIn-influencer-thought-leader culture. Tone: maximum cringe. "
-        "Self-aggrandizing humility, hashtag spam, unironic emoji, fake-deep "
-        "observations about mundane things, corporate jargon (synergy, "
-        "leverage, paradigm, ecosystem, value-add).\n\n"
+        "You are writing for ResuMeme, a satirical site that mocks "
+        "LinkedIn-influencer-thought-leader culture by inflating ordinary "
+        "CV content into maximum corporate cringe. Tone: self-aggrandizing "
+        "humility, hashtag spam, unironic emoji, fake-deep observations, "
+        "jargon (synergy, leverage, paradigm, ecosystem, value-add).\n\n"
         "Given the CV below, return JSON with EXACTLY these fields:\n\n"
         '1. "identity": object with these string fields (empty string if '
         "the CV does not contain it; never invent a value):\n"
-        "   - name: candidate's full name\n"
-        "   - title: their current or most recent role title\n"
-        "   - email\n"
-        "   - phone\n"
-        "   - linkedin: full URL if present\n"
-        "   - github: full URL if present\n\n"
+        "   - name, title, email, phone, linkedin, github\n\n"
         '2. "review": a 100-word fake LinkedIn post written IN FIRST '
-        "PERSON as if the candidate themselves posted it. MUST include:\n"
-        "   - a humble-brag opener (\"Humbled to share...\", \"Grateful "
-        "to announce...\", \"Plot twist...\")\n"
-        "   - reference 1-2 specific things from the CV (a company, a "
-        "skill, years of experience)\n"
-        "   - one fake-deep takeaway (\"And honestly? That's the real "
-        "ROI.\")\n"
-        "   - 5-7 hashtags at the end (#blessed #leadership etc.)\n"
-        "   - emoji sprinkled throughout\n\n"
-        '3. "popups": EXACTLY 10 short (under 70 chars each) '
-        "achievement popups in the same LinkedIn-cringe voice. Each "
-        "leads with one emoji. Each must reference something SPECIFIC "
-        "from the CV (a real company name, a real skill, a real number "
-        "from their experience). Examples of the tone:\n"
-        "   \"🚀 4 years at Acme that disrupted disruption itself\"\n"
-        "   \"💎 Listed Python AND Synergy, iconic flex\"\n\n"
-        f"Candidate name (heuristic guess, may be wrong): {name or 'unknown'}\n"
-        f"CV:\n{text[:6000]}\n\n"
+        "PERSON as if the candidate themselves posted it. MUST include: a "
+        "humble-brag opener, reference 1-2 specifics from the CV, one "
+        "fake-deep takeaway, 5-7 hashtags, emoji throughout.\n\n"
+        '3. "popups": EXACTLY 10 short (<70 chars) achievement popups in '
+        "LinkedIn-cringe voice. Each leads with one emoji and references "
+        "something SPECIFIC from the CV (real company, skill, number).\n\n"
+        '4. "enhanced": object mapping each section\'s canonical_key '
+        "(seen below) to an array of 3-6 bullet strings. Each bullet is "
+        "a wildly inflated rewrite of the original content, transforming "
+        "ordinary work into earth-shaking corporate impact. Keep the real "
+        "companies/skills/dates from the original (do NOT invent), but "
+        "escalate the verbs and stack on buzzwords. Examples:\n"
+        '   - Original: "Wrote unit tests for the API"\n'
+        '     Enhanced: "Architected enterprise-grade test infrastructure '
+        'that fundamentally redefined the API quality vertical"\n'
+        '   - Original skills: "Python, JavaScript"\n'
+        '     Enhanced: ["Polyglot Python virtuoso (decade+ at production '
+        'velocity)", "JavaScript thought leader, full-stack ecosystem '
+        'battle-tested"]\n'
+        "   For one-line sections (Education, Languages) produce 1-3 "
+        "bullets. The enhanced section has the SAME canonical_key shown "
+        "below — match exactly.\n\n"
+        f"Candidate name (heuristic guess, may be wrong): {name or 'unknown'}\n\n"
+        "CV BY SECTION:\n"
+        f"{sections_block}\n\n"
         "Reply with ONLY valid JSON, no markdown."
     )
 
@@ -94,7 +104,7 @@ def generate_roasts(text: str, name: str) -> Optional[dict]:
             model=deployment,
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
-            max_completion_tokens=900,
+            max_completion_tokens=2000,
             temperature=0.9,
         )
         content = resp.choices[0].message.content or "{}"
@@ -113,6 +123,20 @@ def generate_roasts(text: str, name: str) -> Optional[dict]:
         for k in ("name", "title", "email", "phone", "linkedin", "github")
     }
 
-    if not review and not popups and not any(identity.values()):
+    raw_enhanced = data.get("enhanced") if isinstance(data.get("enhanced"), dict) else {}
+    enhanced: dict[str, list[str]] = {}
+    for key, value in raw_enhanced.items():
+        if not isinstance(value, list):
+            continue
+        bullets = [str(b).strip() for b in value if str(b).strip()]
+        if bullets:
+            enhanced[str(key).strip().lower()] = bullets[:8]
+
+    if not review and not popups and not any(identity.values()) and not enhanced:
         return None
-    return {"identity": identity, "review": review, "popups": popups}
+    return {
+        "identity": identity,
+        "review": review,
+        "popups": popups,
+        "enhanced": enhanced,
+    }

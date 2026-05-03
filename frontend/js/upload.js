@@ -3,19 +3,16 @@ const ACCEPTED = ['application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
 const LOADING_MESSAGES = [
-  'Applying 47 layers of professionalism…',
-  'Consulting recruiter psychology database…',
-  'Maximizing buzzword density…',
-  'Calibrating Comic Sans coefficient…',
-  'Detecting passion for synergy…',
-  'Aligning chakras with corporate values…',
-  'Multiplying years of experience by 1.5…',
-  'Checking if you went to Harvard… (you didn\'t)',
-  'Retrofitting buzzwords…',
-  'Leveraging leverage…',
-  'Engaging recruiter dopamine receptors…',
-  'Inserting strategic Comic Sans…',
-  'Enhancement complete. Brace yourself.',
+  'Initializing neural enhancement engine…',
+  'Parsing your professional history…',
+  'Analyzing applicant tracking system patterns…',
+  'Cross-referencing 1.2M+ successful CVs…',
+  'Optimizing keyword density…',
+  'Calibrating recruiter response signals…',
+  'Applying industry-specific tonality…',
+  'Validating against Fortune 500 standards…',
+  'Running ATS-Bypass™ compatibility checks…',
+  'Finalizing your enhanced CV…',
 ];
 
 const dropzone = document.getElementById('upload-zone');

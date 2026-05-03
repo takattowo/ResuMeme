@@ -1,8 +1,8 @@
-# CVEnhancer
+# ResuMeme
 
-> *Sad because HR ignored your CV? We got you.*
-
-A meme website that "enhances" your CV by re-rendering it as a chaotic visual disaster.
+> AI-powered CV enhancement that beats every ATS filter.
+>
+> *(Spoiler: it's a meme site that "enhances" your CV by re-rendering it as a chaotic visual disaster.)*
 
 ## Stack
 
