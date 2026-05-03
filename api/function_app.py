@@ -36,6 +36,16 @@ def health(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse("ok", status_code=200)
 
 
+@app.route(route="diag", methods=["GET"])
+def diag(req: func.HttpRequest) -> func.HttpResponse:
+    from shared.llm_client import diagnose
+    return func.HttpResponse(
+        body=json.dumps(diagnose()),
+        status_code=200,
+        mimetype="application/json",
+    )
+
+
 @app.route(route="upload", methods=["POST"])
 def upload(req: func.HttpRequest) -> func.HttpResponse:
     storage_conn = os.environ.get("STORAGE_CONNECTION_STRING", "")
