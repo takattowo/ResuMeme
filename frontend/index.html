@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CVEnhancer — AI-Powered CV Optimization</title>
+  <link rel="stylesheet" href="/css/landing.css">
+</head>
+<body>
+  <main class="landing">
+    <header>
+      <h1>CVEnhancer<span class="tm">&trade;</span></h1>
+      <p class="tagline">Sad because HR ignored your CV? We got you.</p>
+    </header>
+
+    <section id="upload-zone" class="dropzone" aria-label="CV upload">
+      <input type="file" id="file-input" accept=".pdf,.docx" hidden>
+      <div class="dropzone-inner">
+        <div class="dropzone-icon">&#128196;</div>
+        <p class="dropzone-prompt">Drop your CV here</p>
+        <p class="dropzone-sub">PDF or DOCX, max 5MB</p>
+        <button type="button" id="browse-btn">or click to browse</button>
+      </div>
+    </section>
+
+    <section id="loading" hidden aria-live="polite">
+      <div class="spinner"></div>
+      <p id="loading-msg">Initializing enhancement&hellip;</p>
+    </section>
+
+    <section id="error" hidden role="alert"></section>
+
+    <ul class="features">
+      <li>&#10024; AI-Powered Enhancement&trade;</li>
+      <li>&#10024; Optimized for Recruiter Attention&trade;</li>
+      <li>&#10024; 100% ATS-Incompatible&trade;</li>
+    </ul>
+
+    <p class="warning">
+      &#9888; Anyone with the link can see your enhanced CV including any
+      personal info on it.
+    </p>
+  </main>
+
+  <script type="module" src="/js/upload.js"></script>
+</body>
+</html>
