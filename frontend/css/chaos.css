@@ -377,6 +377,25 @@ body {
 
 .fx-rating { font-size: 0.85em; margin-left: 0.4em; color: #ff8800; }
 
+.fx-numbered-section {
+  counter-reset: cv-item;
+}
+.fx-numbered-section p {
+  counter-increment: cv-item;
+  position: relative;
+  padding-left: 2.4rem;
+}
+.fx-numbered-section p::before {
+  content: counter(cv-item) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 800;
+  font-size: 1.2em;
+  color: #c2410c;
+  font-family: 'Impact', 'Georgia', serif;
+}
+
 @keyframes slow-rotate { to { transform: rotate(360deg); } }
 .fx-avatar-rotate { animation: slow-rotate 4s linear infinite; }
 

@@ -1,4 +1,4 @@
-import { seededRng, pick } from './rng.js';
+import { seededRng, pick, randFloat } from './rng.js';
 import { applyChaos } from './chaos/orchestrator.js';
 import { downloadAsHtml } from './download.js';
 
@@ -129,6 +129,15 @@ function splitWords(text) {
 }
 
 const REVIEW_EMOJIS = ['💼', '🚀', '⭐', '🏆', '🔥', '🤝', '🎯', '✨', '💎', '🦾'];
+const REVIEW_FONTS = [
+  '"Georgia", "Times New Roman", serif',
+  '"Brush Script MT", cursive',
+  '"Comic Sans MS", "Comic Neue", cursive',
+  '"Courier New", monospace',
+  '"Impact", "Charcoal", sans-serif',
+  '"Papyrus", fantasy',
+  '"Lucida Handwriting", cursive',
+];
 
 function makeAiReview(reviewText, seedKey) {
   const card = document.createElement('div');
@@ -137,6 +146,9 @@ function makeAiReview(reviewText, seedKey) {
 
   const localRng = seededRng((seedKey || '') + ':review');
   const emoji = pick(localRng, REVIEW_EMOJIS);
+  const font = pick(localRng, REVIEW_FONTS);
+  const tilt = randFloat(localRng, -2, 2);
+  card.style.transform = `rotate(${tilt}deg)`;
 
   const badge = document.createElement('div');
   badge.className = 'cv-ai-review-badge';
@@ -145,6 +157,7 @@ function makeAiReview(reviewText, seedKey) {
 
   const body = document.createElement('p');
   body.className = 'cv-ai-review-body';
+  body.style.fontFamily = font;
   body.textContent = reviewText;
   card.appendChild(body);
 

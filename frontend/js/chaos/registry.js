@@ -41,12 +41,19 @@ import avatarPosition from './effects/avatarPosition.js';
 import customCursor from './effects/customCursor.js';
 import sectionWobble from './effects/sectionWobble.js';
 import sectionVariety from './effects/sectionVariety.js';
+import numberedList from './effects/numberedList.js';
+import absurdHeading from './effects/absurdHeading.js';
 import konamiMaxChaos from './effects/konamiMaxChaos.js';
 
 export const EFFECTS = [
   // Variety/positioning effects run first so later transforms can stack on top.
   sectionVariety,
   avatarPosition,
+  // Heading-text rewrites must run before glitch/rainbow/strobe pick targets.
+  absurdHeading,
+  // Mark some sections as numbered before emojiBullets so the two are
+  // mutually exclusive (emojiBullets skips numbered sections).
+  numberedList,
   // Word/heading transformations.
   zoomPulse,
   randomCaps,
