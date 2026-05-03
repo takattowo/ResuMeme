@@ -4,9 +4,6 @@ param environmentName string
 @description('Azure region')
 param location string = resourceGroup().location
 
-@description('Repo URL for SWA deployment (set when first deploying)')
-param repositoryUrl string = ''
-
 var token = uniqueString(resourceGroup().id, environmentName)
 var storageName = toLower('rsm${environmentName}${take(token, 8)}')
 var swaName = 'swa-resumee-${environmentName}-${take(token, 6)}'
@@ -52,8 +49,6 @@ resource swa 'Microsoft.Web/staticSites@2023-12-01' = {
   location: location
   sku: { name: 'Free', tier: 'Free' }
   properties: {
-    repositoryUrl: repositoryUrl
-    branch: 'main'
     buildProperties: {
       appLocation: 'frontend'
       apiLocation: 'api'
