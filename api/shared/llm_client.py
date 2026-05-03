@@ -102,13 +102,19 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
     )
 
     try:
-        resp = client.chat.completions.create(
-            model=deployment,
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"},
-            max_completion_tokens=2000,
-            temperature=0.9,
-        )
+        kwargs = {
+            "model": deployment,
+            "messages": [{"role": "user", "content": prompt}],
+            "response_format": {"type": "json_object"},
+            "max_completion_tokens": 6000,
+        }
+        # gpt-5* and o-series are reasoning models. Setting reasoning_effort
+        # low keeps most of the token budget for actual output instead of
+        # internal chain-of-thought, which we don't need for satire.
+        deployment_lower = deployment.lower()
+        if any(prefix in deployment_lower for prefix in ("gpt-5", "o1", "o3", "o4")):
+            kwargs["reasoning_effort"] = "minimal"
+        resp = client.chat.completions.create(**kwargs)
         content = resp.choices[0].message.content or "{}"
         data = json.loads(content)
     except Exception:
