@@ -3,11 +3,13 @@
     "apiRuntime": "python:3.11"
   },
   "routes": [
-    { "route": "/cv/*", "rewrite": "/cv.html" }
+    { "route": "/cv/*", "rewrite": "/cv.html" },
+    { "route": "/careers", "rewrite": "/careers.html" },
+    { "route": "/legal", "rewrite": "/legal.html" }
   ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/api/*", "/cv/*", "/css/*", "/js/*", "/assets/*", "*.{css,js,jpg,png,svg,ico,woff,woff2}"]
+    "exclude": ["/api/*", "/cv/*", "/careers", "/legal", "/css/*", "/js/*", "/assets/*", "*.{css,js,jpg,png,svg,ico,woff,woff2,html}"]
   },
   "responseOverrides": {
     "404": { "rewrite": "/404.html" }

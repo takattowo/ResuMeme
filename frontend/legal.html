@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms & Privacy — ResuMeme</title>
+  <link rel="stylesheet" href="/css/landing.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="logo">
+      <span class="logo-mark">R</span>
+      ResuMeme<span class="logo-tm">®</span>
+    </a>
+    <div class="nav-links">
+      <a href="/#features">Features</a>
+      <a href="/#how-it-works">How it works</a>
+      <a href="/#pricing">Pricing</a>
+    </div>
+  </nav>
+
+  <main class="content-page">
+    <h1>Terms & Privacy</h1>
+    <p class="lede">Last updated: 2026-05-04</p>
+
+    <div class="toc">
+      <h4>On this page</h4>
+      <a href="#what-is">What ResuMeme is</a>
+      <a href="#terms">Terms of Service</a>
+      <a href="#privacy">Privacy Policy</a>
+      <a href="#cookies">Cookies</a>
+      <a href="#contact">Contact &amp; data deletion</a>
+    </div>
+
+    <section id="what-is">
+      <h2>What ResuMeme is</h2>
+      <p>
+        ResuMeme is a satirical website that takes an uploaded CV and re-renders
+        it as a deliberately chaotic, intentionally ridiculous "enhanced" version.
+        The marketing language on the homepage (ATS-Bypass™, neural rewriting,
+        Fortune-500 testimonials, etc.) is part of the joke. The actual output
+        is a meme.
+      </p>
+      <p>
+        ResuMeme is not a real CV optimization product. Do not use it to apply
+        for actual jobs. Do not rely on the AI-generated content for any
+        professional purpose. Treat anything the site produces as humor.
+      </p>
+    </section>
+
+    <section id="terms">
+      <h2>Terms of Service</h2>
+      <p>By using ResuMeme you acknowledge and agree that:</p>
+      <ul>
+        <li>The service is provided "as is" with no warranty of any kind, express or implied, including but not limited to fitness for any particular purpose, especially employment.</li>
+        <li>You will only upload CVs you personally own or have explicit permission to upload. Do not upload other people's resumes without their consent.</li>
+        <li>You will not upload content that is unlawful, harmful, defamatory, or designed to abuse the system (e.g., prompt injection, spam, attempts to extract API credits).</li>
+        <li>The AI-generated content (review, enhanced bullets, achievement popups) is fictional, satirical, and generated automatically. It does not reflect any real assessment of your skills or background.</li>
+        <li>The operators of ResuMeme accept no liability for any consequence arising from your use of the service, including but not limited to lost interview opportunities, hurt feelings, or career setbacks.</li>
+        <li>The service may be discontinued, rate-limited, or have features disabled at any time, without notice, for any reason — most likely because the operator's Azure credit ran out.</li>
+      </ul>
+    </section>
+
+    <section id="privacy">
+      <h2>Privacy Policy</h2>
+      <h3>What we collect</h3>
+      <ul>
+        <li>The CV file (PDF or DOCX) you upload through the dropzone.</li>
+        <li>Text and embedded images extracted from that file by our parser.</li>
+        <li>The unique 8-character link ID we generate for the result page.</li>
+        <li>Standard server logs (timestamp, request path, response code) used for operations and debugging. These are retained per Azure's default policy.</li>
+      </ul>
+
+      <h3>What we do with it</h3>
+      <ul>
+        <li>Store the parsed JSON and extracted images in Azure Blob Storage, encrypted at rest by Azure.</li>
+        <li>Send the parsed text to Azure OpenAI to generate the satirical "enhancement" content.</li>
+        <li>Render the satirical result at your unique URL when someone visits it.</li>
+      </ul>
+
+      <h3>What we don't do</h3>
+      <ul>
+        <li>We do not sell, rent, or share your data with third parties for marketing or any other commercial purpose.</li>
+        <li>We do not run analytics, tracking pixels, or third-party advertising scripts.</li>
+        <li>We do not attempt to identify you beyond the contents of the CV you uploaded.</li>
+        <li>We do not require an account, login, or any personal information beyond the CV you choose to upload.</li>
+      </ul>
+
+      <h3>Where data lives</h3>
+      <p>
+        All data is stored in Microsoft Azure data centers. Processing involves Azure Blob Storage and Azure OpenAI Service. No data is transmitted to any other third-party service.
+      </p>
+
+      <h3>Retention &amp; deletion</h3>
+      <ul>
+        <li>Uploaded files and their parsed content automatically delete after <strong>30 days</strong> via an Azure Blob Storage lifecycle rule.</li>
+        <li>You can request earlier deletion of a specific upload by sending us the link ID through the contact channel below.</li>
+        <li>Server logs are retained per Azure's default platform policy (typically 30–90 days).</li>
+      </ul>
+
+      <h3>Sharing &amp; visibility</h3>
+      <ul>
+        <li>The result URL <strong>is publicly accessible</strong> to anyone who has the link. Treat it like a public URL.</li>
+        <li>If you do not want a CV to be visible to anyone with the link, do not upload it.</li>
+      </ul>
+
+      <h3>Your rights (GDPR / CCPA)</h3>
+      <p>
+        You have the right to request access to, correction of, or deletion of any data we hold about you. Since the only data we collect is the CV you uploaded plus its derived content, deletion is straightforward — contact us with the link ID and we'll remove it from blob storage immediately.
+      </p>
+    </section>
+
+    <section id="cookies">
+      <h2>Cookies</h2>
+      <p>
+        <strong>We do not set any cookies, tracking pixels, or local-storage entries</strong> on this site. The "respawning cookie banner" you may see on result pages is a satirical visual element — it does not store anything on your device, and dismissing it sets nothing.
+      </p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact &amp; data deletion requests</h2>
+      <p>
+        For data deletion requests, complaints, takedown notices, or general feedback, please <a href="https://github.com/takattowo/ResuMeme/issues" target="_blank" rel="noopener">open an issue on our GitHub repository</a>.
+      </p>
+      <p>
+        Include the result-page link or the 8-character ID for any deletion request.
+      </p>
+    </section>
+
+    <a href="/" class="back-link">← Back to home</a>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <strong>ResuMeme<span class="logo-tm">®</span></strong>
+        <p>AI-Powered CV Enhancement<br>© 2026 ResuMeme. All rights reserved.</p>
+        <a href="https://github.com/takattowo/ResuMeme" class="footer-source" target="_blank" rel="noopener">
+          ⌘ Source code on GitHub
+        </a>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <h4>Product</h4>
+          <a href="/#features">Features</a>
+          <a href="/#how-it-works">How it works</a>
+          <a href="/#pricing">Pricing</a>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <a href="https://github.com/takattowo/" target="_blank" rel="noopener">About</a>
+          <a href="/careers">Careers</a>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <a href="/legal">Terms & Privacy</a>
+          <a href="/legal#cookies">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
