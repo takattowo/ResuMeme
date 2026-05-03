@@ -61,7 +61,7 @@ function renderBaseDom(cv) {
   }
   root.appendChild(avatarEl);
 
-  root.appendChild(makeIdentityCard(sections));
+  root.appendChild(makeIdentityCard(sections, cv.aiContent && cv.aiContent.identity));
 
   if (cv.aiContent && cv.aiContent.review) {
     root.appendChild(makeAiReview(cv.aiContent.review));
@@ -146,27 +146,38 @@ function makeAiReview(reviewText) {
   return card;
 }
 
-function makeIdentityCard(sections) {
+function makeIdentityCard(sections, aiIdentity) {
   const card = document.createElement('div');
   card.className = 'cv-identity';
   card.dataset.cvIdentity = '1';
 
-  if (sections.name) {
-    const name = document.createElement('div');
-    name.className = 'cv-identity-name';
-    name.dataset.cvSpecial = 'name';
-    name.textContent = sections.name;
-    card.appendChild(name);
+  const ai = aiIdentity || {};
+  const looksLikePara = (s) => !s || s.length > 80 || /\s\w+\s\w+\s\w+\s\w+/.test(s);
+
+  // Prefer AI-extracted name; fall back to heuristic (and reject if it
+  // looks like a paragraph rather than a name).
+  const heuristicName = looksLikePara(sections.name) ? '' : sections.name;
+  const name = (ai.name && ai.name.trim()) || heuristicName || '';
+  const title = (ai.title && ai.title.trim()) || (looksLikePara(sections.title) ? '' : sections.title) || '';
+
+  if (name) {
+    const el = document.createElement('div');
+    el.className = 'cv-identity-name';
+    el.dataset.cvSpecial = 'name';
+    el.textContent = name;
+    card.appendChild(el);
   }
 
-  if (sections.title) {
-    const title = document.createElement('div');
-    title.className = 'cv-identity-title';
-    title.textContent = sections.title;
-    card.appendChild(title);
+  if (title) {
+    const el = document.createElement('div');
+    el.className = 'cv-identity-title';
+    el.textContent = title;
+    card.appendChild(el);
   }
 
-  const contacts = extractContacts(sections.raw_text || '');
+  const aiContacts = [ai.email, ai.phone, ai.linkedin, ai.github]
+    .filter((s) => s && String(s).trim());
+  const contacts = aiContacts.length ? aiContacts : extractContacts(sections.raw_text || '');
   if (contacts.length) {
     const strip = document.createElement('div');
     strip.className = 'cv-identity-contacts';
