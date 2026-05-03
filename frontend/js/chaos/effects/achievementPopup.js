@@ -26,13 +26,18 @@ export default {
   name: 'achievementPopup',
   targets: 'page',
   density: 1,
-  apply(_el, rng) {
+  apply(_el, rng, ctx) {
+    const aiPopups = (ctx && ctx.cv && ctx.cv.aiContent && Array.isArray(ctx.cv.aiContent.popups))
+      ? ctx.cv.aiContent.popups.filter((p) => typeof p === 'string' && p.length)
+      : [];
+    const pool = aiPopups.length ? aiPopups.concat(POOL) : POOL;
+
     const schedule = () => {
       const ms = randInt(rng, 4000, 7000);
       setTimeout(() => {
         const popup = document.createElement('div');
         popup.className = 'fx-popup';
-        popup.textContent = pick(rng, POOL);
+        popup.textContent = pick(rng, pool);
         document.body.appendChild(popup);
         setTimeout(() => popup.remove(), 4000);
         schedule();

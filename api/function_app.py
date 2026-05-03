@@ -9,7 +9,9 @@ import azure.functions as func
 from shared.blob_client import BlobClient
 from shared.docx_parser import extract_docx
 from shared.id_gen import generate_id
+from shared.llm_client import generate_roasts
 from shared.pdf_parser import extract_pdf
+from shared.resume_filter import looks_like_resume
 from shared.section_splitter import split_sections
 
 MAX_BYTES = 5 * 1024 * 1024
@@ -58,9 +60,16 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
         parsed = extract_pdf(body) if kind == "pdf" else extract_docx(body)
     except Exception:
         logging.exception("parse failure; falling back to raw_text only")
-        parsed = {"raw_text": "", "images": []}
+        parsed = {"raw_text": "", "images": [], "page_count": 1}
+
+    ok, reason = looks_like_resume(parsed["raw_text"], parsed.get("page_count", 1))
+    if not ok:
+        return _json_error(422, "not_a_resume", reason)
 
     sections = split_sections(parsed["raw_text"])
+
+    # AI is best-effort. None = fall back to generic frontend content.
+    ai_content = generate_roasts(parsed["raw_text"], sections.get("name", ""))
 
     cv_id = generate_id()
     image_paths: list[str] = []
@@ -76,6 +85,7 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
         "sections": sections,
         "images": image_paths,
         "ownerId": None,
+        "aiContent": ai_content,
     }
     bc.write_json(f"{cv_id}.json", document)
 

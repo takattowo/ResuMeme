@@ -19,6 +19,10 @@ node_modules/
 
 # Azurite local storage
 .azurite/
+__azurite_db_*.json
+__blobstorage__/
+__queuestorage__/
+AzuriteConfig
 
 # IDEs
 .vscode/

@@ -63,6 +63,10 @@ function renderBaseDom(cv) {
 
   root.appendChild(makeIdentityCard(sections));
 
+  if (cv.aiContent && cv.aiContent.review) {
+    root.appendChild(makeAiReview(cv.aiContent.review));
+  }
+
   if (hasStructured) {
     appendSection('summary', sections.summary);
     appendSection('experience', sections.experience);
@@ -122,6 +126,24 @@ function splitWords(text) {
     }
   }
   return frag;
+}
+
+function makeAiReview(reviewText) {
+  const card = document.createElement('div');
+  card.className = 'cv-ai-review';
+  card.dataset.cvAiReview = '1';
+
+  const badge = document.createElement('div');
+  badge.className = 'cv-ai-review-badge';
+  badge.textContent = '🤖 AI Career Counselor Review™';
+  card.appendChild(badge);
+
+  const body = document.createElement('p');
+  body.className = 'cv-ai-review-body';
+  body.textContent = reviewText;
+  card.appendChild(body);
+
+  return card;
 }
 
 function makeIdentityCard(sections) {

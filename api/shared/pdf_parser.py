@@ -6,6 +6,7 @@ import fitz  # PyMuPDF
 class ParsedDocument(TypedDict):
     raw_text: str
     images: list[bytes]
+    page_count: int
 
 
 def extract_pdf(data: bytes) -> ParsedDocument:
@@ -15,7 +16,7 @@ def extract_pdf(data: bytes) -> ParsedDocument:
         pages_text = [page.get_text("text") for page in doc]
         raw_text = "\n".join(pages_text)
         images = _extract_images(doc)
-        return {"raw_text": raw_text, "images": images}
+        return {"raw_text": raw_text, "images": images, "page_count": len(doc)}
     finally:
         doc.close()
 

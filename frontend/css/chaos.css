@@ -113,6 +113,41 @@ body {
 .cv-contact-chip:nth-child(2n)  { animation-delay: 0.3s; background: linear-gradient(135deg, #0ff, #ff0); }
 .cv-contact-chip:nth-child(3n)  { animation-delay: 0.6s; background: linear-gradient(135deg, #f0f, #0ff); }
 
+/* AI Career Counselor Review — prominent, readable, intentionally over-the-top. */
+.cv-ai-review {
+  position: relative;
+  margin: 0 auto 2rem;
+  padding: 1.5rem;
+  max-width: 720px;
+  background: #fff;
+  border-radius: 12px;
+  border: 3px dashed #0a0;
+  box-shadow: 0 8px 24px rgba(0, 160, 0, 0.25);
+  z-index: 55;
+}
+
+.cv-ai-review-badge {
+  display: inline-block;
+  background: #0a0;
+  color: #fff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.cv-ai-review-body {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #1a1a1a;
+  font-style: italic;
+}
+
 .cv-avatar {
   position: fixed;
   top: 1.5rem;
