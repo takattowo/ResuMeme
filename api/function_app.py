@@ -38,9 +38,43 @@ def health(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.route(route="diag", methods=["GET"])
 def diag(req: func.HttpRequest) -> func.HttpResponse:
-    from shared.llm_client import diagnose
+    from shared.llm_client import diagnose, generate_roasts
+    out = diagnose()
+
+    # Also exercise the real generate_roasts pipeline with a sample CV.
+    sample_items = [
+        {
+            "heading": "Experience",
+            "canonical": "experience",
+            "body": "Acme Corp - Software Engineer (2022-2024)\nWrote unit tests for the payment API.",
+        },
+        {
+            "heading": "Skills",
+            "canonical": "skills",
+            "body": "Python, JavaScript",
+        },
+    ]
+    try:
+        result = generate_roasts(
+            "Jane Doe\nSoftware Engineer\n\nExperience\nAcme Corp - Software Engineer (2022-2024)",
+            "Jane Doe",
+            sample_items,
+        )
+        if result is None:
+            out["roasts_status"] = "returned None"
+        else:
+            out["roasts_status"] = "ok"
+            out["roasts_review_chars"] = len(result.get("review", ""))
+            out["roasts_popups_count"] = len(result.get("popups", []))
+            out["roasts_enhanced_keys"] = list(result.get("enhanced", {}).keys())
+            out["roasts_identity_name"] = result.get("identity", {}).get("name", "")
+    except Exception as e:
+        out["roasts_status"] = "exception"
+        out["roasts_error_type"] = type(e).__name__
+        out["roasts_error_message"] = str(e)[:600]
+
     return func.HttpResponse(
-        body=json.dumps(diagnose()),
+        body=json.dumps(out),
         status_code=200,
         mimetype="application/json",
     )
