@@ -1,0 +1,43 @@
+import { pick, randInt } from '../../rng.js';
+const POOL = [
+  '🏆 Optimized synergy buzzwords (×3)',
+  '🎯 ATS bypass: Comic Sans deployed',
+  '✨ 47 leadership keywords detected',
+  '🚀 Quantified impact: ⭐⭐⭐⭐⭐',
+  '💼 Recruiter dopamine: MAXIMUM',
+  '🎓 Harvard probability: NaN%',
+  '🔥 Buzzword density: critical',
+  '💎 Premium professional aura unlocked',
+  '🦾 LinkedIn algorithm: pleased',
+  '🧠 Big brain energy verified',
+  '📈 Career trajectory: VERTICAL',
+  '🎉 Promotion incoming (citation needed)',
+  '⚡ Rizz coefficient: peak',
+  '🛸 Recruiter abducted by enthusiasm',
+  '🎩 Top hat tipped by 3 hiring managers',
+  '🍔 Lunch meeting probability: 99%',
+  '🦄 Unicorn employee status approved',
+  '📊 Synergy graph: trending up',
+  '🧙 Spellbook of buzzwords: complete',
+  '🎪 Greatest CV on Earth™',
+];
+
+export default {
+  name: 'achievementPopup',
+  targets: 'page',
+  density: 1,
+  apply(_el, rng) {
+    const schedule = () => {
+      const ms = randInt(rng, 4000, 7000);
+      setTimeout(() => {
+        const popup = document.createElement('div');
+        popup.className = 'fx-popup';
+        popup.textContent = pick(rng, POOL);
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 4000);
+        schedule();
+      }, ms);
+    };
+    schedule();
+  },
+};
