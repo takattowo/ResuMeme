@@ -270,7 +270,7 @@ document.addEventListener('click', async (e) => {
       e.target.textContent = '✓ Copied!';
       setTimeout(() => { e.target.textContent = '📋 Copy share link'; }, 1500);
     } catch {
-      e.target.textContent = 'Copy failed — select URL manually';
+      e.target.textContent = 'Copy failed, select URL manually';
     }
   }
 });

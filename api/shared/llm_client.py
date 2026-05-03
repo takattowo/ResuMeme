@@ -66,6 +66,8 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
         "CV content into maximum corporate cringe. Tone: self-aggrandizing "
         "humility, hashtag spam, unironic emoji, fake-deep observations, "
         "jargon (synergy, leverage, paradigm, ecosystem, value-add).\n\n"
+        "STYLE RULE: Do not use em dashes (—) anywhere in your output. "
+        "Use periods, commas, colons, or parentheses instead.\n\n"
         "Given the CV below, return JSON with EXACTLY these fields:\n\n"
         '1. "identity": object with these string fields (empty string if '
         "the CV does not contain it; never invent a value):\n"

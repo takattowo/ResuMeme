@@ -1,4 +1,4 @@
-// mulberry32 — small deterministic PRNG.
+// mulberry32: small deterministic PRNG.
 export function mulberry32(seed) {
   let s = seed >>> 0;
   return function rand() {
@@ -9,7 +9,7 @@ export function mulberry32(seed) {
   };
 }
 
-// cyrb53-style hash — fold a string into a 32-bit seed.
+// cyrb53-style hash: fold a string into a 32-bit seed.
 export function hashSeed(str) {
   let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
   for (let i = 0; i < str.length; i++) {

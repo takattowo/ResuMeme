@@ -1,6 +1,6 @@
 // Convert some bullet-style sections into numbered lists. Marks the
 // section with .fx-numbered-section; the CSS uses counter-increment to
-// number paragraphs. Mutually exclusive with emojiBullets — emojiBullets
+// number paragraphs. Mutually exclusive with emojiBullets, since emojiBullets
 // checks for this class and skips.
 
 const BULLET_SECTIONS = [
