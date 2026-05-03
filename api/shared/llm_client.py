@@ -72,7 +72,7 @@ def generate_roasts(text: str, name: str) -> Optional[dict]:
             model=deployment,
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
-            max_tokens=700,
+            max_completion_tokens=900,
             temperature=0.9,
         )
         content = resp.choices[0].message.content or "{}"
