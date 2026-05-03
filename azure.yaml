@@ -8,5 +8,6 @@ infra:
 services:
   web:
     project: .
-    language: ts
+    language: js
     host: staticwebapp
+    dist: frontend

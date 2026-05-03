@@ -1,0 +1,9 @@
+{
+  "name": "resumee",
+  "version": "1.0.0",
+  "description": "ResuMeme: AI-powered CV enhancement",
+  "private": true,
+  "scripts": {
+    "build": "echo Static site, no build step needed."
+  }
+}
