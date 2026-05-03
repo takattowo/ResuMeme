@@ -36,9 +36,9 @@ body {
   position: relative;
   margin-bottom: 1.5rem;
   padding: 1.25rem;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.93);
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
 }
 
 [data-cv-heading] {

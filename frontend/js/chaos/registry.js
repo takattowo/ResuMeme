@@ -43,10 +43,13 @@ import sectionWobble from './effects/sectionWobble.js';
 import sectionVariety from './effects/sectionVariety.js';
 import numberedList from './effects/numberedList.js';
 import absurdHeading from './effects/absurdHeading.js';
+import pageBackground from './effects/pageBackground.js';
 import konamiMaxChaos from './effects/konamiMaxChaos.js';
 
 export const EFFECTS = [
-  // Variety/positioning effects run first so later transforms can stack on top.
+  // Page-level setup first.
+  pageBackground,
+  // Variety/positioning effects run early so later transforms can stack on top.
   sectionVariety,
   avatarPosition,
   // Heading-text rewrites must run before glitch/rainbow/strobe pick targets.
