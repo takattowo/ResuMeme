@@ -48,6 +48,9 @@ resource swa 'Microsoft.Web/staticSites@2023-12-01' = {
   name: swaName
   location: location
   sku: { name: 'Free', tier: 'Free' }
+  tags: {
+    'azd-service-name': 'web'
+  }
   properties: {
     buildProperties: {
       appLocation: 'frontend'
