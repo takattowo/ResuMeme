@@ -1,5 +1,6 @@
 import { seededRng, pick } from './rng.js';
 import { applyChaos } from './chaos/orchestrator.js';
+import { downloadAsHtml } from './download.js';
 
 const root = document.getElementById('cv-root');
 
@@ -144,3 +145,19 @@ function appendActionBar() {
 
   root.appendChild(bar);
 }
+
+document.addEventListener('click', async (e) => {
+  if (!e.target) return;
+  if (e.target.id === 'btn-download') {
+    e.preventDefault();
+    downloadAsHtml();
+  } else if (e.target.id === 'btn-share') {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      e.target.textContent = '✓ Copied!';
+      setTimeout(() => { e.target.textContent = '📋 Copy share link'; }, 1500);
+    } catch {
+      e.target.textContent = 'Copy failed — select URL manually';
+    }
+  }
+});
