@@ -280,11 +280,17 @@ body {
 }
 .fx-cycling-bg { animation: ugly-bg calc(10s / var(--chaos-speed)) linear infinite; }
 
-.fx-wordcloud { display: block; line-height: 1; }
+.fx-wordcloud { display: block; line-height: 1.8; }
 .fx-wordcloud > span {
   display: inline-block;
-  margin: 0.25rem;
-  padding: 0.1em 0.3em;
+  margin: 0.4rem 0.5rem;
+  padding: 0.15em 0.4em;
+  vertical-align: middle;
+}
+.fx-wordcloud .fx-rating {
+  font-size: 0.65em;
+  vertical-align: middle;
+  margin-left: 0.2em;
 }
 
 .fx-popup {
