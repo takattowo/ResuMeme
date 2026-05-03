@@ -61,11 +61,7 @@ function renderBaseDom(cv) {
   }
   root.appendChild(avatarEl);
 
-  const header = document.createElement('header');
-  header.dataset.cvSection = 'header';
-  if (sections.name) header.appendChild(makeHeading(sections.name, 'name'));
-  if (sections.title) header.appendChild(makeText(sections.title, 'p'));
-  root.appendChild(header);
+  root.appendChild(makeIdentityCard(sections));
 
   if (hasStructured) {
     appendSection('summary', sections.summary);
@@ -126,6 +122,65 @@ function splitWords(text) {
     }
   }
   return frag;
+}
+
+function makeIdentityCard(sections) {
+  const card = document.createElement('div');
+  card.className = 'cv-identity';
+  card.dataset.cvIdentity = '1';
+
+  if (sections.name) {
+    const name = document.createElement('div');
+    name.className = 'cv-identity-name';
+    name.dataset.cvSpecial = 'name';
+    name.textContent = sections.name;
+    card.appendChild(name);
+  }
+
+  if (sections.title) {
+    const title = document.createElement('div');
+    title.className = 'cv-identity-title';
+    title.textContent = sections.title;
+    card.appendChild(title);
+  }
+
+  const contacts = extractContacts(sections.raw_text || '');
+  if (contacts.length) {
+    const strip = document.createElement('div');
+    strip.className = 'cv-identity-contacts';
+    for (const item of contacts) {
+      const chip = document.createElement('span');
+      chip.className = 'cv-contact-chip';
+      chip.dataset.cvSpecial = 'contact';
+      chip.textContent = item;
+      strip.appendChild(chip);
+    }
+    card.appendChild(strip);
+  }
+
+  return card;
+}
+
+function extractContacts(text) {
+  const hits = [];
+  const seen = new Set();
+  const patterns = [
+    /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+    /(?:\+\d{1,3}[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}/g,
+    /(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+/gi,
+    /(?:https?:\/\/)?(?:www\.)?github\.com\/[a-zA-Z0-9-]+/gi,
+  ];
+  for (const pat of patterns) {
+    const matches = text.match(pat) || [];
+    for (const m of matches) {
+      const trimmed = m.trim();
+      if (trimmed.length >= 7 && !seen.has(trimmed.toLowerCase())) {
+        seen.add(trimmed.toLowerCase());
+        hits.push(trimmed);
+      }
+    }
+  }
+  return hits.slice(0, 6);
 }
 
 function appendActionBar() {

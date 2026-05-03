@@ -28,17 +28,90 @@ body {
 [data-cv-section] {
   position: relative;
   margin-bottom: 1.5rem;
-  padding: 1rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 [data-cv-heading] {
   margin: 0 0 0.5rem;
   font-size: 1.5rem;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 [data-cv-word] {
   display: inline-block;
+  text-shadow:
+    1px 1px 0 rgba(255, 255, 255, 0.95),
+    -1px -1px 0 rgba(255, 255, 255, 0.95),
+    1px -1px 0 rgba(255, 255, 255, 0.95),
+    -1px 1px 0 rgba(255, 255, 255, 0.95);
 }
+
+/* Identity card — high-contrast spotlight for name + contact info,
+   intentionally outside [data-cv-section] so it skips most chaos. */
+.cv-identity {
+  position: relative;
+  margin: 0 auto 2rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  box-shadow: 0 0 0 4px #f0f, 0 0 0 8px #0ff, 0 12px 32px rgba(0,0,0,0.25);
+  max-width: 720px;
+  z-index: 60;
+}
+
+@keyframes name-glow {
+  0%, 100% { text-shadow: 0 0 8px #f0f, 0 0 16px #f0f, 0 0 24px #f0f; }
+  50%      { text-shadow: 0 0 8px #0ff, 0 0 16px #0ff, 0 0 24px #0ff; }
+}
+.cv-identity-name {
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: #111;
+  font-family: 'Impact', 'Comic Sans MS', sans-serif;
+  text-transform: uppercase;
+  animation: name-glow 2.5s ease-in-out infinite;
+  line-height: 1.1;
+}
+
+.cv-identity-title {
+  font-size: 1.25rem;
+  color: #444;
+  margin-top: 0.5rem;
+  font-style: italic;
+  font-family: 'Comic Sans MS', cursive;
+}
+
+.cv-identity-contacts {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+@keyframes chip-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 0, 255, 0.7); transform: scale(1); }
+  50%      { box-shadow: 0 0 0 8px rgba(255, 0, 255, 0); transform: scale(1.05); }
+}
+.cv-contact-chip {
+  display: inline-block;
+  padding: 0.4rem 0.85rem;
+  background: linear-gradient(135deg, #ff0, #f0f);
+  color: #000;
+  font-weight: 700;
+  border-radius: 999px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  border: 2px solid #000;
+  animation: chip-pulse 1.8s ease-in-out infinite;
+}
+.cv-contact-chip:nth-child(2n)  { animation-delay: 0.3s; background: linear-gradient(135deg, #0ff, #ff0); }
+.cv-contact-chip:nth-child(3n)  { animation-delay: 0.6s; background: linear-gradient(135deg, #f0f, #0ff); }
 
 .cv-avatar {
   position: fixed;

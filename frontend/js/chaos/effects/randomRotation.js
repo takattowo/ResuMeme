@@ -4,6 +4,6 @@ export default {
   targets: 'section',
   density: 1,
   apply(el, rng) {
-    el.style.transform = `rotate(${randFloat(rng, -8, 8)}deg)`;
+    el.style.transform = `rotate(${randFloat(rng, -3, 3)}deg)`;
   },
 };
