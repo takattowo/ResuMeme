@@ -5,7 +5,8 @@ export default {
   targets: 'section',
   density: 1,
   apply(el, rng) {
-    if (!['experience', 'education'].includes(el.dataset.cvSection)) return;
+    const BULLET_SECTIONS = ['experience', 'education', 'projects', 'certifications', 'awards', 'volunteer'];
+    if (!BULLET_SECTIONS.includes(el.dataset.cvSection)) return;
     for (const p of el.querySelectorAll('p')) {
       const bullet = pick(rng, BULLETS);
       p.textContent = `${bullet} ${p.textContent}`;

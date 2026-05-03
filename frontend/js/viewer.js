@@ -42,8 +42,7 @@ function showFatal(message) {
 
 function renderBaseDom(cv) {
   const sections = cv.sections || {};
-  const hasStructured =
-    sections.summary || sections.experience || sections.skills || sections.education;
+  const items = Array.isArray(sections.items) ? sections.items : [];
 
   const avatarUrl = (cv.imageUrls || [])[0] || null;
   const avatarFallback = pick(seededRng(cv.id + ':emoji'), ['🤡', '👽', '💀', '🦄', '👻']);
@@ -67,11 +66,10 @@ function renderBaseDom(cv) {
     root.appendChild(makeAiReview(cv.aiContent.review));
   }
 
-  if (hasStructured) {
-    appendSection('summary', sections.summary);
-    appendSection('experience', sections.experience);
-    appendSection('skills', sections.skills);
-    appendSection('education', sections.education);
+  if (items.length) {
+    for (const item of items) {
+      appendSection(item);
+    }
   } else {
     appendRawText(sections.raw_text || '');
   }
@@ -79,13 +77,15 @@ function renderBaseDom(cv) {
   appendActionBar();
 }
 
-function appendSection(name, body) {
+function appendSection(item) {
+  const body = (item.body || '').trim();
   if (!body) return;
+  const canonical = item.canonical || item.heading.toLowerCase();
   const section = document.createElement('section');
-  section.dataset.cvSection = name;
-  section.appendChild(makeHeading(name.toUpperCase(), name));
+  section.dataset.cvSection = canonical;
+  section.appendChild(makeHeading(item.heading.toUpperCase(), canonical));
   for (const line of body.split('\n')) {
-    if (line.trim()) section.appendChild(makeText(line));
+    if (line.trim()) section.appendChild(makeText(line.trim()));
   }
   root.appendChild(section);
 }
