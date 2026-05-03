@@ -43,14 +43,16 @@ def _is_known_heading(line: str) -> tuple[bool, str, str]:
     return False, "", ""
 
 
-def _detect_heading(line: str) -> tuple[bool, str, str]:
-    """Return (is_heading, canonical_key, display_text) for a single line."""
+def _detect_generic_heading(line: str) -> tuple[bool, str, str]:
+    """Generic heading heuristic, NOT including the known-list check.
+
+    Returns (is_heading, canonical_key, display_text). Used only when the
+    parser knows the previous line was blank, since CV body lines (cert
+    names, project titles, etc.) are often title-cased but not headings.
+    """
     text = line.strip()
     if not text:
         return False, "", ""
-    is_known, canon, display = _is_known_heading(text)
-    if is_known:
-        return True, canon, display
     if len(text) > 50:
         return False, "", ""
     if not _HEADING_CHARS.match(text):
@@ -61,11 +63,21 @@ def _detect_heading(line: str) -> tuple[bool, str, str]:
         return False, "", ""
     is_all_caps = all(w.isupper() for w in alpha_words)
     is_title_case = all(w[0].isupper() for w in alpha_words if w[0].isalpha())
-    # Require either all-caps OR (title case AND at least 2 words) — avoids
-    # treating one-word identity lines like "Dev" as a heading.
     if is_all_caps or (is_title_case and len(alpha_words) >= 2):
         return True, text_clean.lower(), text_clean
     return False, "", ""
+
+
+def _detect_heading(line: str) -> tuple[bool, str, str]:
+    """Compatibility wrapper: known-list match OR generic heuristic.
+
+    Used by the merge step where blank-line context is unavailable. Real
+    parsing uses the split known/generic functions to apply blank-line gating.
+    """
+    is_known, canon, display = _is_known_heading(line)
+    if is_known:
+        return True, canon, display
+    return _detect_generic_heading(line)
 
 
 def _merge_wrapped_lines(text: str) -> str:
@@ -145,6 +157,7 @@ def split_sections(text: str) -> Sections:
     current_heading = ""
     current_canonical = ""
     current_body: list[str] = []
+    prev_blank = True  # treat start of body as "after a blank line"
 
     def flush() -> None:
         if current_heading:
@@ -158,18 +171,32 @@ def split_sections(text: str) -> Sections:
 
     for raw_line in body_lines:
         stripped = raw_line.strip()
-        is_h, canon, display = _detect_heading(stripped) if stripped else (False, "", "")
+        if not stripped:
+            if current_heading and current_body and current_body[-1] != "":
+                current_body.append("")
+            prev_blank = True
+            continue
+
+        # Known-list headings always count. Generic title-case detection only
+        # counts if preceded by a blank line, otherwise CV body lines (cert
+        # names, project titles, language pairs) get falsely promoted.
+        is_known, canon, display = _is_known_heading(stripped)
+        is_h = is_known
+        if not is_known and prev_blank:
+            generic_h, generic_canon, generic_display = _detect_generic_heading(stripped)
+            if generic_h:
+                is_h = True
+                canon, display = generic_canon, generic_display
+
         if is_h:
             flush()
             current_heading = display
             current_canonical = canon
             current_body = []
-        elif stripped:
-            if current_heading:
-                current_body.append(stripped)
-        else:
-            if current_heading and current_body and current_body[-1] != "":
-                current_body.append("")
+        elif current_heading:
+            current_body.append(stripped)
+        prev_blank = False
+
     flush()
 
     full_merged = "\n".join(raw_lines[:start] + body_lines)

@@ -2,17 +2,19 @@ const MAX_BYTES = 5 * 1024 * 1024;
 const ACCEPTED = ['application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
+// Each message has a duration roughly matching the real backend phase it
+// covers: parsing is fast, the AI call is the bulk of the latency.
 const LOADING_MESSAGES = [
-  'Initializing neural enhancement engine…',
-  'Parsing your professional history…',
-  'Analyzing applicant tracking system patterns…',
-  'Cross-referencing 1.2M+ successful CVs…',
-  'Optimizing keyword density…',
-  'Calibrating recruiter response signals…',
-  'Applying industry-specific tonality…',
-  'Validating against Fortune 500 standards…',
-  'Running ATS-Bypass™ compatibility checks…',
-  'Finalizing your enhanced CV…',
+  { text: 'Uploading your CV securely…', ms: 1500 },
+  { text: 'Parsing document structure…', ms: 1800 },
+  { text: 'Detecting sections and skills…', ms: 1800 },
+  { text: 'Cross-referencing 1.2M+ successful CVs…', ms: 2500 },
+  { text: 'Running neural enhancement engine…', ms: 3500 },
+  { text: 'Optimizing keyword density…', ms: 2500 },
+  { text: 'Calibrating recruiter response signals…', ms: 2500 },
+  { text: 'Validating against Fortune 500 standards…', ms: 2000 },
+  { text: 'Running ATS-Bypass™ compatibility checks…', ms: 2000 },
+  { text: 'Finalizing your enhanced CV…', ms: 2500 },
 ];
 
 const dropzone = document.getElementById('upload-zone');
@@ -99,10 +101,12 @@ async function handleFile(file) {
 
 function cycleLoadingMessages() {
   let i = 0;
-  loadingMsg.textContent = LOADING_MESSAGES[0];
-  const interval = setInterval(() => {
+  loadingMsg.textContent = LOADING_MESSAGES[0].text;
+  const tick = () => {
+    if (loadingEl.hidden) return;
     i = (i + 1) % LOADING_MESSAGES.length;
-    loadingMsg.textContent = LOADING_MESSAGES[i];
-    if (loadingEl.hidden) clearInterval(interval);
-  }, 600);
+    loadingMsg.textContent = LOADING_MESSAGES[i].text;
+    setTimeout(tick, LOADING_MESSAGES[i].ms);
+  };
+  setTimeout(tick, LOADING_MESSAGES[0].ms);
 }

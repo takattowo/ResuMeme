@@ -104,6 +104,28 @@ def test_detects_unknown_heading_via_caps_heuristic():
     assert "Won the thing" in by_canon["awards"]
 
 
+def test_cert_list_items_are_not_promoted_to_headings():
+    """Real bug from a deployed CV: cert lines were treated as headings
+    because they pass the title-case heuristic. Fixed by requiring a
+    blank line before generic-detected headings."""
+    text = (
+        "Jane Doe\nCloud Engineer\n\n"
+        "Certifications\n"
+        "Azure Engineer Expert\n"
+        "AWS Architect Associate\n"
+        "Microsoft Certified: Azure AI\n"
+    )
+    result = split_sections(text)
+    by_canon = _by_canon(result)
+    assert "certifications" in by_canon
+    body = by_canon["certifications"]
+    assert "Azure Engineer Expert" in body
+    assert "AWS Architect Associate" in body
+    # Should NOT have been promoted to their own sections.
+    assert "azure engineer expert" not in by_canon
+    assert "aws architect associate" not in by_canon
+
+
 def test_does_not_treat_short_title_as_heading():
     text = "Jane Doe\nDev\n\nSummary\nShe writes code."
     result = split_sections(text)
