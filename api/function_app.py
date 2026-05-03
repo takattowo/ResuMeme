@@ -11,6 +11,7 @@ from shared.docx_parser import extract_docx
 from shared.id_gen import generate_id
 from shared.llm_client import generate_roasts
 from shared.pdf_parser import extract_pdf
+from shared.rate_limiter import check as rate_check, client_ip, record as rate_record
 from shared.resume_filter import looks_like_resume
 from shared.section_splitter import split_sections
 
@@ -37,6 +38,18 @@ def health(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.route(route="upload", methods=["POST"])
 def upload(req: func.HttpRequest) -> func.HttpResponse:
+    storage_conn = os.environ.get("STORAGE_CONNECTION_STRING", "")
+    ip = client_ip(req.headers)
+    ok, retry_after, reason = rate_check(storage_conn, ip)
+    if not ok:
+        if reason == "daily_cap":
+            msg = "You have hit today's upload limit from this IP. Try again tomorrow."
+        else:
+            msg = f"Slow down. Please wait {retry_after} seconds before uploading again."
+        resp = _json_error(429, "rate_limited", msg)
+        resp.headers["Retry-After"] = str(retry_after)
+        return resp
+
     files = req.files
     if not files or "file" not in files:
         return _json_error(400, "no_file", "No file uploaded.")
@@ -92,6 +105,7 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
         "aiContent": ai_content,
     }
     bc.write_json(f"{cv_id}.json", document)
+    rate_record(storage_conn, ip)
 
     return func.HttpResponse(
         body=json.dumps({"id": cv_id, "url": f"/cv/{cv_id}"}),
