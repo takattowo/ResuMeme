@@ -1,8 +1,8 @@
 # ResuMeme
 
-A small project for learning the Azure stack end-to-end: Static Web Apps, managed Functions, Blob Storage, and Azure OpenAI.
+Live on: https://black-desert-031be090f.7.azurestaticapps.net/
 
-The app takes an uploaded CV (PDF or DOCX), parses it, runs the content through an LLM, and renders the result back to the user. It deploys via `azd` to a Free-tier SWA + Standard LRS storage account, and authenticates to Azure OpenAI with a key.
+A small project for learning the Azure stack end-to-end: Static Web Apps, managed Functions, Blob Storage, and Azure OpenAI. The app takes an uploaded CV (PDF or DOCX), parses it, runs the content through an LLM, and renders the result back to the user. It deploys via `azd` to a Free-tier SWA + Standard LRS storage account, and authenticates to Azure OpenAI with a key.
 
 ## Stack
 
