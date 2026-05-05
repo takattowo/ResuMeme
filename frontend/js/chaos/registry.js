@@ -35,6 +35,7 @@ import npcDialogue from './effects/npcDialogue.js';
 import cookieRespawn from './effects/cookieRespawn.js';
 import stuckLoadingBar from './effects/stuckLoadingBar.js';
 import fakeBadges from './effects/fakeBadges.js';
+import looksmaxxingBadge from './effects/looksmaxxingBadge.js';
 import sparkleScatter from './effects/sparkleScatter.js';
 import skillsRatings from './effects/skillsRatings.js';
 import inflatedYears from './effects/inflatedYears.js';
@@ -93,6 +94,7 @@ export const EFFECTS = [
   cookieRespawn,
   stuckLoadingBar,
   fakeBadges,
+  looksmaxxingBadge,
   sparkleScatter,
   italianMascotInvasion,
   // Section-specific roasts.
