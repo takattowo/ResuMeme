@@ -1,4 +1,7 @@
 import { pick, randInt } from '../../rng.js';
+import { spawnMascot } from './italianMascotInvasion.js';
+import { spawnNpcBurst } from './npcDialogue.js';
+
 const SEQUENCE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
   'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
@@ -18,8 +21,15 @@ export default {
 
 function trigger(rng) {
   document.documentElement.style.setProperty('--chaos-speed', '2');
+  document.documentElement.dataset.brainrotMax = '1';
   fireConfetti(rng);
   playDialup();
+  escalateBrainrot(rng);
+}
+
+function escalateBrainrot(rng) {
+  spawnMascot(rng, 12);
+  spawnNpcBurst(rng, 5);
 }
 
 function fireConfetti(rng) {
