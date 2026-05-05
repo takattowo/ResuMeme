@@ -31,6 +31,7 @@ import watermark from './effects/watermark.js';
 import wordCloud from './effects/wordCloud.js';
 import achievementPopup from './effects/achievementPopup.js';
 import engagementWidget from './effects/engagementWidget.js';
+import npcDialogue from './effects/npcDialogue.js';
 import cookieRespawn from './effects/cookieRespawn.js';
 import stuckLoadingBar from './effects/stuckLoadingBar.js';
 import fakeBadges from './effects/fakeBadges.js';
@@ -88,6 +89,7 @@ export const EFFECTS = [
   // Floating UI.
   achievementPopup,
   engagementWidget,
+  npcDialogue,
   cookieRespawn,
   stuckLoadingBar,
   fakeBadges,

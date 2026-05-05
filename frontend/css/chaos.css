@@ -531,3 +531,35 @@ body.fx-comic-cursor, body.fx-comic-cursor * {
   font-size: 1.25rem;
   border-top: 4px solid #000;
 }
+
+/* ---------- Brainrot: NPC dialogue bubble ---------- */
+.fx-npc-bubble {
+  position: fixed;
+  background: #fff;
+  color: #111;
+  border: 3px solid #000;
+  border-radius: 18px;
+  padding: 0.55rem 0.9rem;
+  font-family: 'Comic Sans MS', cursive;
+  font-weight: 700;
+  font-size: 1rem;
+  z-index: 310;
+  box-shadow: 4px 4px 0 #000;
+  animation: npc-bubble-in 0.25s ease-out;
+  max-width: 240px;
+  pointer-events: none;
+}
+.fx-npc-bubble::after {
+  content: '';
+  position: absolute;
+  left: 1.5rem;
+  bottom: -10px;
+  width: 0; height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 10px solid #000;
+}
+@keyframes npc-bubble-in {
+  from { transform: scale(0.6); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
