@@ -39,7 +39,6 @@ import stuckLoadingBar from './effects/stuckLoadingBar.js';
 import fakeBadges from './effects/fakeBadges.js';
 import looksmaxxingBadge from './effects/looksmaxxingBadge.js';
 import rizzMeter from './effects/rizzMeter.js';
-import tungTungSahurClock from './effects/tungTungSahurClock.js';
 import sparkleScatter from './effects/sparkleScatter.js';
 import skillsRatings from './effects/skillsRatings.js';
 import inflatedYears from './effects/inflatedYears.js';
@@ -102,7 +101,6 @@ export const EFFECTS = [
   fakeBadges,
   looksmaxxingBadge,
   rizzMeter,
-  tungTungSahurClock,
   sparkleScatter,
   italianMascotInvasion,
   // Section-specific roasts.

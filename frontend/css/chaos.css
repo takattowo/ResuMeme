@@ -598,7 +598,7 @@ body.fx-comic-cursor, body.fx-comic-cursor * {
 /* ---------- Brainrot: rizz meter ---------- */
 .fx-rizz-meter {
   position: fixed;
-  bottom: 1rem;
+  bottom: 7rem;
   right: 1rem;
   z-index: 220;
   width: 220px;
@@ -644,25 +644,6 @@ body.fx-comic-cursor, body.fx-comic-cursor * {
   margin-left: 0.15em;
 }
 
-/* ---------- Brainrot: tung tung tung sahur clock ---------- */
-.fx-tung-clock {
-  position: fixed;
-  top: 1rem;
-  right: 50%;
-  transform: translateX(50%);
-  z-index: 210;
-  background: #000;
-  color: #fff;
-  font-family: monospace;
-  font-weight: 700;
-  font-size: 0.95rem;
-  padding: 0.4rem 0.9rem;
-  border-radius: 999px;
-  border: 2px solid #ff0;
-  pointer-events: none;
-  letter-spacing: 0.08em;
-}
-
 /* ---------- Brainrot: konami max-mode boost ---------- */
 html[data-brainrot-max="1"] .fx-mascot-card,
 html[data-brainrot-max="1"] .fx-npc-bubble,
@@ -670,10 +651,6 @@ html[data-brainrot-max="1"] .fx-rizz-meter,
 html[data-brainrot-max="1"] .fx-looksmaxxing {
   filter: drop-shadow(0 0 6px #f0f) saturate(1.4);
   transform: scale(1.1);
-}
-html[data-brainrot-max="1"] .fx-tung-clock {
-  filter: drop-shadow(0 0 6px #f0f) saturate(1.4);
-  transform: translateX(50%) scale(1.1);
 }
 html[data-brainrot-max="1"] .fx-mascot-card {
   animation-duration: 3s;
