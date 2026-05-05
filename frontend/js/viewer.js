@@ -159,7 +159,7 @@ function makeAiReview(reviewText, seedKey) {
 
   const badge = document.createElement('div');
   badge.className = 'cv-ai-review-badge';
-  badge.textContent = `${emoji} Why You Hire This Person™`;
+  badge.textContent = `${emoji} Why You Should Hire Me`;
   card.appendChild(badge);
 
   const body = document.createElement('p');

@@ -124,27 +124,36 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
         '1. "identity": object with these string fields (empty string if '
         "the CV does not contain it; never invent a value):\n"
         "   - name, title, email, phone, linkedin, github\n\n"
-        '2. "review": a 100-word fake LinkedIn post written IN FIRST '
+        '2. "review": a 130-word fake LinkedIn post written IN FIRST '
         "PERSON as if the candidate themselves posted it. MUST include: a "
-        "humble-brag opener, reference 1-2 specifics from the CV, one "
-        "fake-deep takeaway, 5-7 hashtags, emoji throughout.\n\n"
-        '3. "popups": EXACTLY 10 short (<70 chars) achievement popups in '
+        "humble-brag opener, reference 2-3 specifics from the CV, one "
+        "fake-deep takeaway, a story-arc moment (\"I almost gave up...\"), "
+        "7-9 hashtags, emoji throughout.\n\n"
+        '3. "popups": EXACTLY 12 short (<70 chars) achievement popups in '
         "LinkedIn-cringe voice. Each leads with one emoji and references "
         "something SPECIFIC from the CV (real company, skill, number).\n\n"
         '4. "enhanced": object mapping each section\'s canonical_key '
-        "(seen below) to an array of 3-6 bullet strings. Each bullet is "
+        "(seen below) to an array of 4-7 bullet strings. Each bullet is "
         "a wildly inflated rewrite of the original content, transforming "
-        "ordinary work into earth-shaking corporate impact. Keep the real "
-        "companies/skills/dates from the original (do NOT invent), but "
-        "escalate the verbs and stack on buzzwords. Examples:\n"
+        "ordinary work into earth-shaking corporate impact. Lean into "
+        "this: stack 2-3 buzzwords per bullet, invent grandiose verbs, "
+        "imply transformative business outcomes, sprinkle in fake metrics "
+        "where the original lacked numbers (e.g. \"reducing latency by "
+        '~37%\"), and frame mundane tasks as paradigm shifts. Keep the '
+        "real companies/skills/dates from the original (do NOT change "
+        "those), but escalate everything else to peak corporate cringe. "
+        "Bullets should be 12-25 words each, longer than the original. "
+        "Examples:\n"
         '   - Original: "Wrote unit tests for the API"\n'
         '     Enhanced: "Architected enterprise-grade test infrastructure '
-        'that fundamentally redefined the API quality vertical"\n'
+        "that fundamentally redefined the API quality vertical, slashing "
+        'production defects by ~42% across cross-functional pods"\n'
         '   - Original skills: "Python, JavaScript"\n'
         '     Enhanced: ["Polyglot Python virtuoso (decade+ at production '
-        'velocity)", "JavaScript thought leader, full-stack ecosystem '
-        'battle-tested"]\n'
-        "   For one-line sections (Education, Languages) produce 1-3 "
+        "velocity, mission-critical pipelines, zero-downtime ethos)\", "
+        '"JavaScript thought leader; full-stack ecosystem battle-tested '
+        'across hyperscale frontends and stakeholder-facing dashboards"]\n'
+        "   For one-line sections (Education, Languages) produce 2-4 "
         "bullets. The enhanced section has the SAME canonical_key shown "
         "below — match exactly.\n\n"
         f"Candidate name (heuristic guess, may be wrong): {name or 'unknown'}\n\n"
@@ -158,14 +167,13 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
             "model": deployment,
             "messages": [{"role": "user", "content": prompt}],
             "response_format": {"type": "json_object"},
-            "max_completion_tokens": 6000,
+            "max_completion_tokens": 9000,
         }
-        # gpt-5* and o-series are reasoning models. Setting reasoning_effort
-        # low keeps most of the token budget for actual output instead of
-        # internal chain-of-thought, which we don't need for satire.
+        # gpt-5* and o-series are reasoning models. "low" gives noticeably
+        # better satire/inflation than "minimal" while keeping cost modest.
         deployment_lower = deployment.lower()
         if any(prefix in deployment_lower for prefix in ("gpt-5", "o1", "o3", "o4")):
-            kwargs["reasoning_effort"] = "minimal"
+            kwargs["reasoning_effort"] = "low"
         resp = client.chat.completions.create(**kwargs)
         content = resp.choices[0].message.content or "{}"
         data = json.loads(content)
@@ -175,7 +183,7 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
 
     review = str(data.get("review", "")).strip()
     raw_popups = data.get("popups", []) if isinstance(data.get("popups"), list) else []
-    popups = [str(p).strip() for p in raw_popups if str(p).strip()][:12]
+    popups = [str(p).strip() for p in raw_popups if str(p).strip()][:14]
 
     raw_identity = data.get("identity") if isinstance(data.get("identity"), dict) else {}
     identity = {
