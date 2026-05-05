@@ -663,12 +663,14 @@ body.fx-comic-cursor, body.fx-comic-cursor * {
 html[data-brainrot-max="1"] .fx-mascot-card,
 html[data-brainrot-max="1"] .fx-npc-bubble,
 html[data-brainrot-max="1"] .fx-rizz-meter,
-html[data-brainrot-max="1"] .fx-looksmaxxing,
-html[data-brainrot-max="1"] .fx-tung-clock {
+html[data-brainrot-max="1"] .fx-looksmaxxing {
   filter: drop-shadow(0 0 6px #f0f) saturate(1.4);
   transform: scale(1.1);
 }
+html[data-brainrot-max="1"] .fx-tung-clock {
+  filter: drop-shadow(0 0 6px #f0f) saturate(1.4);
+  transform: translateX(50%) scale(1.1);
+}
 html[data-brainrot-max="1"] .fx-mascot-card {
-  /* layer the rotation onto the existing drift animation */
   animation-duration: 3s;
 }
