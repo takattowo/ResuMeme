@@ -1,4 +1,5 @@
 import { pick } from '../../rng.js';
+import { BRAINROT_HEADINGS } from '../brainrot/vocab.js';
 
 const ABSURD = [
   'DEFINITELY REAL EXPERIENCE',
@@ -26,7 +27,7 @@ export default {
     const headings = Array.from(document.querySelectorAll('[data-cv-heading]'));
     if (headings.length === 0) return;
     const target = headings[Math.floor(rng() * headings.length)];
-    const replacement = pick(rng, ABSURD);
+    const replacement = pick(rng, ABSURD.concat(BRAINROT_HEADINGS));
 
     target.replaceChildren();
     const parts = replacement.split(/(\s+)/);
