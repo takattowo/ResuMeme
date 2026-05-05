@@ -253,7 +253,11 @@ body {
 
 .fx-table {
   border: 5px ridge #f0f !important;
-  background: repeating-linear-gradient(45deg, #ff0, #ff0 10px, #f0f 10px, #f0f 20px);
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
+    repeating-linear-gradient(45deg, #ff0, #ff0 14px, #f0f 14px, #f0f 28px);
+  background-blend-mode: normal;
+  padding: 1.5rem !important;
 }
 
 .fx-watermark {

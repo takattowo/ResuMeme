@@ -113,53 +113,42 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
         sections_block = f"(no parsed sections; raw text)\n{text[:6000]}"
 
     prompt = (
-        "You are writing for ResuMeme, a satirical site that mocks "
-        "LinkedIn-influencer-thought-leader culture by inflating ordinary "
-        "CV content into maximum corporate cringe. Tone: self-aggrandizing "
-        "humility, hashtag spam, unironic emoji, fake-deep observations, "
-        "jargon (synergy, leverage, paradigm, ecosystem, value-add).\n\n"
-        "STYLE RULE: Do not use em dashes (—) anywhere in your output. "
-        "Use periods, commas, colons, or parentheses instead.\n\n"
-        "Given the CV below, return JSON with EXACTLY these fields:\n\n"
-        '1. "identity": object with these string fields (empty string if '
-        "the CV does not contain it; never invent a value):\n"
-        "   - name, title, email, phone, linkedin, github\n\n"
-        '2. "review": a 130-word fake LinkedIn post written IN FIRST '
-        "PERSON as if the candidate themselves posted it. MUST include: a "
-        "humble-brag opener, reference 2-3 specifics from the CV, one "
-        "fake-deep takeaway, a story-arc moment (\"I almost gave up...\"), "
-        "7-9 hashtags, emoji throughout.\n\n"
-        '3. "popups": EXACTLY 12 short (<70 chars) achievement popups in '
-        "LinkedIn-cringe voice. Each leads with one emoji and references "
-        "something SPECIFIC from the CV (real company, skill, number).\n\n"
-        '4. "enhanced": object mapping each section\'s canonical_key '
-        "(seen below) to an array of 4-7 bullet strings. Each bullet is "
-        "a wildly inflated rewrite of the original content, transforming "
-        "ordinary work into earth-shaking corporate impact. Lean into "
-        "this: stack 2-3 buzzwords per bullet, invent grandiose verbs, "
-        "imply transformative business outcomes, sprinkle in fake metrics "
-        "where the original lacked numbers (e.g. \"reducing latency by "
-        '~37%\"), and frame mundane tasks as paradigm shifts. Keep the '
-        "real companies/skills/dates from the original (do NOT change "
-        "those), but escalate everything else to peak corporate cringe. "
-        "Bullets should be 12-25 words each, longer than the original. "
+        "You write for ResuMeme: satire that inflates CVs into LinkedIn-cringe "
+        "fused with Gen-Z brainrot. Voice = corporate jargon (synergy, "
+        "leverage, paradigm, ecosystem) COLLIDING with brainrot slang "
+        "(skibidi, sigma, rizz, gyatt, mewing, fanum tax, ohio, gigachad, "
+        "looksmaxxed, mogged, NPC, no cap, goated, bussin). Mix both per "
+        "bullet. Loud, explosive, brainrotted.\n\n"
+        "RULES: No em dashes. Never invent companies/skills/dates. "
+        "Output ONLY valid JSON, no markdown.\n\n"
+        "JSON fields:\n\n"
+        '1. "identity": {name, title, email, phone, linkedin, github}. '
+        "Empty string if absent. Never invent.\n\n"
+        '2. "review": ~120-word first-person fake LinkedIn post by the '
+        "candidate. Humble-brag opener, 2-3 CV specifics, one fake-deep "
+        '("almost gave up") moment, 1-2 brainrot terms slipped in, 7-9 '
+        "hashtags, emoji throughout.\n\n"
+        '3. "popups": 12 short (<70 chars) achievement popups. Each '
+        "starts with one emoji, references a real CV item (company, "
+        "skill, number), pure cringe + brainrot.\n\n"
+        '4. "enhanced": map each section\'s canonical_key to 4-6 bullets, '
+        "8-18 words each. Each bullet must:\n"
+        "   - Stack 2-3 buzzwords AND 1-2 brainrot terms.\n"
+        "   - Use grandiose verbs (architected, engineered, weaponized, "
+        "ascended, ohio-pilled, mogged).\n"
+        "   - Invent fake metrics when the original had none "
+        '(e.g. "+47% sigma throughput", "~3.2x rizz coefficient").\n'
+        "   - Keep real companies/skills/dates intact.\n"
         "Examples:\n"
-        '   - Original: "Wrote unit tests for the API"\n'
-        '     Enhanced: "Architected enterprise-grade test infrastructure '
-        "that fundamentally redefined the API quality vertical, slashing "
-        'production defects by ~42% across cross-functional pods"\n'
-        '   - Original skills: "Python, JavaScript"\n'
-        '     Enhanced: ["Polyglot Python virtuoso (decade+ at production '
-        "velocity, mission-critical pipelines, zero-downtime ethos)\", "
-        '"JavaScript thought leader; full-stack ecosystem battle-tested '
-        'across hyperscale frontends and stakeholder-facing dashboards"]\n'
-        "   For one-line sections (Education, Languages) produce 2-4 "
-        "bullets. The enhanced section has the SAME canonical_key shown "
-        "below — match exactly.\n\n"
-        f"Candidate name (heuristic guess, may be wrong): {name or 'unknown'}\n\n"
+        '   "Wrote unit tests for the API" -> "Weaponized enterprise-tier '
+        'test infra, slashing prod defects ~42%. NPCs filtered, sigma."\n'
+        '   "Python, JavaScript" -> ["Python sigma grindset, decade+ '
+        'production velocity, gigachad pipelines.", '
+        '"JavaScript rizz-maxxed across hyperscale stacks, no cap."]\n'
+        "Education/Languages: 2-3 bullets.\n\n"
+        f"Candidate name (heuristic, may be wrong): {name or 'unknown'}\n\n"
         "CV BY SECTION:\n"
-        f"{sections_block}\n\n"
-        "Reply with ONLY valid JSON, no markdown."
+        f"{sections_block}"
     )
 
     try:
@@ -167,7 +156,7 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
             "model": deployment,
             "messages": [{"role": "user", "content": prompt}],
             "response_format": {"type": "json_object"},
-            "max_completion_tokens": 9000,
+            "max_completion_tokens": 7000,
         }
         # gpt-5* and o-series are reasoning models. "low" gives noticeably
         # better satire/inflation than "minimal" while keeping cost modest.

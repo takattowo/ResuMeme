@@ -32,6 +32,6 @@ export default {
   targets: 'page',
   density: 1,
   apply(_el, rng) {
-    spawnMascot(rng, randInt(rng, 2, 4));
+    spawnMascot(rng, randInt(rng, 1, 3));
   },
 };

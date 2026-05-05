@@ -138,12 +138,11 @@ function splitWords(text) {
 const REVIEW_EMOJIS = ['💼', '🚀', '⭐', '🏆', '🔥', '🤝', '🎯', '✨', '💎', '🦾'];
 const REVIEW_FONTS = [
   '"Georgia", "Times New Roman", serif',
-  '"Brush Script MT", cursive',
   '"Comic Sans MS", "Comic Neue", cursive',
   '"Courier New", monospace',
-  '"Impact", "Charcoal", sans-serif',
-  '"Papyrus", fantasy',
-  '"Lucida Handwriting", cursive',
+  '"Verdana", "Geneva", sans-serif',
+  '"Trebuchet MS", "Lucida Sans", sans-serif',
+  '"Palatino Linotype", "Book Antiqua", serif',
 ];
 
 function makeAiReview(reviewText, seedKey) {
