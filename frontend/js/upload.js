@@ -50,6 +50,18 @@ fileInput.addEventListener('change', (e) => {
   if (e.target.files.length) handleFile(e.target.files[0]);
 });
 
+// When the browser restores this page from the back/forward cache
+// (e.g. user clicks Back from /cv/{id}), the dropzone is still hidden
+// from the previous upload. Reset UI state and clear the input so the
+// next file selection fires a `change` event.
+window.addEventListener('pageshow', (e) => {
+  if (!e.persisted) return;
+  dropzone.hidden = false;
+  loadingEl.hidden = true;
+  clearError();
+  fileInput.value = '';
+});
+
 function showError(message) {
   errorEl.textContent = message;
   errorEl.hidden = false;
