@@ -490,3 +490,34 @@ body.fx-comic-cursor, body.fx-comic-cursor * {
   .fx-cycling-bg { background: #fdd; }
   .fx-marquee span { transform: translateX(0); }
 }
+
+/* ---------- Brainrot: Italian mascot invasion ---------- */
+@keyframes mascot-drift {
+  0%   { transform: translate(0, 0) rotate(-2deg); }
+  50%  { transform: translate(8px, -10px) rotate(3deg); }
+  100% { transform: translate(0, 0) rotate(-2deg); }
+}
+.fx-mascot-card {
+  position: fixed;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, #fff 50%, #009246 50%, #009246 60%, #fff 60%, #fff 80%, #ce2b37 80%);
+  border: 3px solid #000;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  font-family: 'Comic Sans MS', cursive;
+  pointer-events: none;
+  animation: mascot-drift 6s ease-in-out infinite;
+  max-width: 180px;
+  text-align: center;
+}
+.fx-mascot-emoji { font-size: 2rem; line-height: 1; }
+.fx-mascot-name  { font-weight: 900; font-size: 0.95rem; margin-top: 0.2rem; color: #000; }
+.fx-mascot-tag   { font-size: 0.7rem; font-style: italic; color: #333; margin-top: 0.1rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-mascot-card { animation: none; }
+}

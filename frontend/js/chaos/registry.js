@@ -49,6 +49,7 @@ import numberedList from './effects/numberedList.js';
 import absurdHeading from './effects/absurdHeading.js';
 import pageBackground from './effects/pageBackground.js';
 import konamiMaxChaos from './effects/konamiMaxChaos.js';
+import italianMascotInvasion from './effects/italianMascotInvasion.js';
 
 export const EFFECTS = [
   // Page-level setup first.
@@ -89,6 +90,7 @@ export const EFFECTS = [
   stuckLoadingBar,
   fakeBadges,
   sparkleScatter,
+  italianMascotInvasion,
   // Section-specific roasts.
   skillsRatings,
   inflatedYears,
