@@ -1,6 +1,6 @@
 :root {
-  --bg: #ffffff;
-  --bg-alt: #f5f7fb;
+  --bg: #eef1f7;
+  --bg-alt: #e3e8f1;
   --fg: #0b1320;
   --muted: #5b667a;
   --line: #e3e8ef;
@@ -723,31 +723,3 @@ a { color: inherit; text-decoration: none; }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------- Auto dark mode (landing page only; CV viewer stays light) ---------- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b1220;
-    --bg-alt: #111a2c;
-    --fg: #e6edf7;
-    --muted: #9aa6bb;
-    --line: #1f2a3d;
-    --accent: #5b8def;
-    --accent-strong: #6b96f0;
-    --accent-soft: #18233a;
-    --error: #ef4444;
-    --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.55);
-  }
-  .navbar { background: rgba(11, 18, 32, 0.85); }
-  .pricing-card,
-  .feature-card,
-  .testi-grid blockquote,
-  .dropzone {
-    background: var(--bg-alt);
-    border-color: var(--line);
-  }
-  .logo-strip span { color: #6b7891; }
-  .pricing-cta { color: #fff; }
-  .hero-badge { background: var(--accent-soft); color: #c5d6ff; }
-  .activity-text { color: var(--fg); }
-}
