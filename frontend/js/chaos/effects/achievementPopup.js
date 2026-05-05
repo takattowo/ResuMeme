@@ -20,6 +20,13 @@ const POOL = [
   '📊 Synergy graph: trending up',
   '🧙 Spellbook of buzzwords: complete',
   '🎪 Greatest CV on Earth™',
+  '🏆 Achievement Unlocked: SIGMA GRINDSET',
+  '🥇 Achievement: FANUM TAX PAID IN FULL',
+  '👑 Mogged 47 recruiters · Looksmaxxing complete',
+  '🔱 Rizz coefficient: GIGACHAD-tier',
+  '🥁 Tung Tung Tung Sahur survived (×3)',
+  '🦈 Tralalero Tralala approval received',
+  '⚠️ Only in Ohio — verified',
 ];
 
 export default {
