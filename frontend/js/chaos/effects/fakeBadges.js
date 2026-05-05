@@ -6,6 +6,11 @@ const BADGES = [
   '✓ Recruiter Approved',
   '✓ ATS-Compatible*',
   '✓ Big Brain Certified',
+  '✓ GIGACHAD CERTIFIED',
+  '✓ OHIO PROFESSIONAL',
+  '✓ MEWING CERTIFIED',
+  '✓ SIGMA GRINDSET™',
+  '✓ NO CAP VERIFIED',
 ];
 export default {
   name: 'fakeBadges',
