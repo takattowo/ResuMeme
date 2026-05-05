@@ -610,3 +610,21 @@ body.fx-comic-cursor, body.fx-comic-cursor * {
 .fx-rizz-label { font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; }
 .fx-rizz-bar   { width: 100%; height: 12px; background: #333; border: 1px solid #ff0; }
 .fx-rizz-fill  { height: 100%; background: linear-gradient(90deg, #f0f, #0ff, #ff0); }
+
+/* ---------- Brainrot: ohio watermark ---------- */
+.fx-ohio-watermark {
+  position: fixed;
+  inset: -20vh -20vw;
+  z-index: 4;                /* below existing .fx-watermark (z-index: 5) */
+  pointer-events: none;
+  font-family: 'Impact', sans-serif;
+  font-size: 4rem;
+  color: rgba(206, 43, 55, 0.08);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  line-height: 1.4;
+  word-spacing: 0.5em;
+  transform: rotate(-22deg);
+  overflow: hidden;
+  user-select: none;
+}

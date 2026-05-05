@@ -27,6 +27,7 @@ import marqueeBanner from './effects/marqueeBanner.js';
 import brainrotMarquee from './effects/brainrotMarquee.js';
 import tableSection from './effects/tableSection.js';
 import watermark from './effects/watermark.js';
+import ohioWatermark from './effects/ohioWatermark.js';
 // import cyclingBg from './effects/cyclingBg.js';        // disabled: dominates the page
 import wordCloud from './effects/wordCloud.js';
 import achievementPopup from './effects/achievementPopup.js';
@@ -87,6 +88,7 @@ export const EFFECTS = [
   brainrotMarquee,
   tableSection,
   watermark,
+  ohioWatermark,
   wordCloud,
   // Floating UI.
   achievementPopup,
