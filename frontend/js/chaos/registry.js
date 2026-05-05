@@ -24,6 +24,7 @@ import boldRandom from './effects/boldRandom.js';
 import precipitation from './effects/precipitation.js';
 // import mixedFonts from './effects/mixedFonts.js';     // disabled: destroys readability
 import marqueeBanner from './effects/marqueeBanner.js';
+import brainrotMarquee from './effects/brainrotMarquee.js';
 import tableSection from './effects/tableSection.js';
 import watermark from './effects/watermark.js';
 // import cyclingBg from './effects/cyclingBg.js';        // disabled: dominates the page
@@ -80,6 +81,7 @@ export const EFFECTS = [
   precipitation,
   // Layout / skill cloud.
   marqueeBanner,
+  brainrotMarquee,
   tableSection,
   watermark,
   wordCloud,

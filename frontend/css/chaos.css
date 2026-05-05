@@ -521,3 +521,13 @@ body.fx-comic-cursor, body.fx-comic-cursor * {
 @media (prefers-reduced-motion: reduce) {
   .fx-mascot-card { animation: none; }
 }
+
+/* ---------- Brainrot: secondary marquee ---------- */
+.fx-marquee-brainrot {
+  top: auto;
+  bottom: 0;
+  background: #ce2b37;
+  color: #fff;
+  font-size: 1.25rem;
+  border-top: 4px solid #000;
+}
