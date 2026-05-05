@@ -12,6 +12,7 @@ import randomCaps from './effects/randomCaps.js';
 import markHighlight from './effects/markHighlight.js';
 import strikethrough from './effects/strikethrough.js';
 import citationNeeded from './effects/citationNeeded.js';
+import gyattReaction from './effects/gyattReaction.js';
 import glitch from './effects/glitch.js';
 import rainbow from './effects/rainbowGradient.js';
 import wingdingsFlicker from './effects/wingdingsFlicker.js';
@@ -73,6 +74,7 @@ export const EFFECTS = [
   markHighlight,
   strikethrough,
   citationNeeded,
+  gyattReaction,
   glitch,
   rainbow,
   wingdingsFlicker,

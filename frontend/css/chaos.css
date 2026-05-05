@@ -628,3 +628,14 @@ body.fx-comic-cursor, body.fx-comic-cursor * {
   overflow: hidden;
   user-select: none;
 }
+
+/* ---------- Brainrot: gyatt reaction tag ---------- */
+.fx-gyatt::after {
+  content: ' [GYATT]';
+  font-size: 0.7em;
+  font-style: italic;
+  color: #c00;
+  font-weight: 700;
+  vertical-align: super;
+  margin-left: 0.15em;
+}
