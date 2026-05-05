@@ -1,4 +1,6 @@
-import { randInt } from '../../rng.js';
+import { randInt, pick } from '../../rng.js';
+import { RIZZ_TIERS } from '../brainrot/vocab.js';
+
 export default {
   name: 'engagementWidget',
   targets: 'page',
@@ -14,6 +16,9 @@ export default {
         `Buzzword saturation: ${randInt(rng, 80, 99)}%`,
         `Hire probability: ${randInt(rng, 100, 200)}%`,
         `Synergy index: ${randInt(rng, 9000, 9999)}`,
+        `Rizz tier: ${pick(rng, RIZZ_TIERS)}`,
+        `Skibidi-rate: ${randInt(rng, 70, 99)}%`,
+        `Mogged today: ${randInt(rng, 5, 47)}`,
       ].join('\n');
       widget.textContent = text;
     }
