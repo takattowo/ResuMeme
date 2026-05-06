@@ -136,11 +136,10 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
         "JSON fields:\n\n"
         '1. "identity": {name, title, email, phone, linkedin, github}. '
         "Empty string if absent. Never invent.\n\n"
-        '2. "review": ~140-word first-person fake LinkedIn post by the '
-        "candidate. Humble-brag opener, 2-3 CV specifics, one fake-deep "
-        '("almost gave up") moment with absurd resolution, 2 brainrot terms '
-        "slipped in, one suspiciously specific metric, 8-10 hashtags, emoji "
-        "throughout.\n\n"
+        '2. "review": ~80-word first-person fake LinkedIn post by the '
+        "candidate. Tight and punchy. Humble-brag opener, 1-2 CV specifics, "
+        "one absurd punchline, 1-2 brainrot terms, 5-7 hashtags, emoji "
+        "throughout. Save the long inflation for the enhanced bullets.\n\n"
         '3. "popups": 12 short (<70 chars) achievement popups. Each starts '
         "with one emoji, references a real CV item (company, skill, number), "
         "pure cringe + brainrot. Vary tone: half are flexes, half are "
@@ -148,24 +147,40 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
         '4. "enhanced": map each section\'s canonical_key to 4-6 bullets. '
         "Vary bullet length deliberately for rhythm:\n"
         "   - Mix 1-2 SHORT punchy bullets (6-12 words) per section.\n"
-        "   - Mix 2-4 LONG absurd bullets (18-32 words) per section, "
-        "with at least one buildup-and-punchline structure.\n"
+        "   - Mix 2-4 LONG absurd bullets (18-35 words) per section, "
+        "with at least one buildup-and-punchline structure.\n\n"
+        "CRITICAL: thin source sections (Languages, Skills lists, "
+        "Education one-liners, Hobbies, Certifications) are the FATTEST "
+        "targets, not the smallest. A one-word entry like 'English: B2' "
+        "must explode into 4-5 bullets, several of them LONG (25-35 "
+        "words). Do not match output length to input length. The thinner "
+        "the input, the more elaborate the inflation. Make every "
+        "language/skill/cert sound like a multi-decade civilizational "
+        "achievement.\n\n"
         "Every bullet must:\n"
         "   - Stack 2-3 buzzwords AND 1-2 brainrot terms.\n"
         "   - Use grandiose verbs (architected, weaponized, ascended, "
         "ohio-pilled, mogged, championed, evangelized, operationalized).\n"
         "   - Invent fake metrics when the original lacked numbers.\n"
-        "   - Keep real companies/skills/dates intact.\n"
-        "Examples:\n"
-        '   short: "Weaponized enterprise-tier test infra. NPCs filtered, sigma."\n'
-        '   long:  "Architected paradigm-shifting test ecosystem at <Company>, '
-        "slashing prod defects ~42.7% across cross-functional pods, eventually "
-        'ascending past the concept of bugs entirely. Recruiters wept. Goated."\n'
-        '   short: "Python sigma grindset. Decade-plus, gigachad pipelines."\n'
-        '   long:  "JavaScript rizz-maxxed across hyperscale frontends, '
-        "battle-tested through three reorgs and one company-wide rebrand, "
-        'culminating in a Slack message my manager called "concerning". No cap."\n'
-        "Education/Languages: 2-3 bullets, can be shorter overall.\n\n"
+        "   - Keep real companies/skills/dates/proper-nouns intact.\n"
+        "Examples (note how thin inputs become MORE elaborate, not less):\n"
+        '   "English: B2" -> ["English communication ascended past CEFR '
+        'levels, mogging fluency benchmarks daily.", "Slack-rizz native, '
+        "production-grade thread etiquette, sigma-tier passive-aggressive "
+        'subtext.", "Cross-cultural ohio behavior verified across 4 time '
+        'zones and one HR escalation. Goated.", "Negotiated a salary in '
+        "British English while crying in American English. Both versions "
+        'concluded with offer letters."]\n'
+        '   "Wrote unit tests for the API" -> ["Weaponized enterprise-tier '
+        'test infra, NPCs filtered, sigma.", "Architected paradigm-shifting '
+        "QA ecosystem at <Company>, slashing prod defects ~42.7% across "
+        "cross-functional pods, eventually ascending past the concept of "
+        'bugs. Recruiters wept. Goated."]\n'
+        '   "Python, JavaScript" -> ["Python sigma grindset, decade-plus, '
+        'gigachad pipelines.", "JavaScript rizz-maxxed across hyperscale '
+        "frontends, battle-tested through three reorgs and a company-wide "
+        'rebrand, culminating in a Slack message my manager called '
+        '"concerning". No cap."]\n\n'
         f"Candidate name (heuristic, may be wrong): {name or 'unknown'}\n\n"
         "CV BY SECTION:\n"
         f"{sections_block}"
