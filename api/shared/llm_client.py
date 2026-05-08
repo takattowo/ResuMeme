@@ -94,10 +94,12 @@ def diagnose() -> dict:
 
 
 def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optional[dict]:
-    """Generate personalized roast content from a CV.
+    """Generate a satirical 'sigma founder' portfolio from a real CV.
 
-    Returns dict with keys identity (dict), review (str), popups (list[str])
-    and enhanced (dict[str, list[str]]), or None if AI is unavailable / fails.
+    The CV input becomes raw material for an absurdly inflated personal
+    portfolio site (hero bio, fake case studies, fake testimonials, vanity
+    stats, contact block). Returns dict with keys identity, popups, hero,
+    stats, selectedWork, testimonials, contact — or None on any failure.
     """
     client = _client()
     deployment = _deployment()
@@ -113,74 +115,98 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
         sections_block = f"(no parsed sections; raw text)\n{text[:6000]}"
 
     prompt = (
-        "You write for ResuMeme: satire that inflates CVs into LinkedIn-cringe "
-        "fused with Gen-Z brainrot. Voice = corporate jargon (synergy, "
-        "leverage, paradigm, ecosystem, value-add) COLLIDING with brainrot "
-        "slang (skibidi, sigma, rizz, gyatt, mewing, fanum tax, ohio, "
-        "gigachad, looksmaxxed, mogged, NPC, no cap, goated, bussin, "
-        "type beat). Mix both. Loud, explosive, deadpan-absurd.\n\n"
+        "You write for ResuMeme: satire that converts a real CV into an "
+        "ABSURD personal portfolio site for a self-styled sigma founder / "
+        "thought leader. Voice = corporate jargon (synergy, leverage, "
+        "paradigm, ecosystem, value-add, north star) COLLIDING with Gen-Z "
+        "brainrot (skibidi, sigma, rizz, gyatt, mewing, fanum tax, ohio, "
+        "gigachad, looksmaxxed, mogged, NPC, no cap, goated, bussin, type "
+        "beat). Mix both. Loud, explosive, deadpan-absurd.\n\n"
         "HUMOR TACTICS to use across the output:\n"
         "  - Punchline structure: build pompous corporate phrasing, then "
         "cut to a brainrot/dumb tag at the end.\n"
         "  - Suspiciously specific metrics: \"+47.3% sigma throughput\", "
         '"~3.2x rizz coefficient", "saved 0.8 stakeholder-years per quarter".\n'
         "  - Mundane-to-cosmic escalation: trivial tasks framed as paradigm "
-        "shifts, civilizational milestones, or geopolitical victories.\n"
+        "shifts, civilizational milestones, geopolitical victories.\n"
         "  - Deadpan oxymorons: \"strategic chaos\", \"calm grindset\", "
         '"humble GIGACHAD energy", "compliant ohio behavior".\n'
-        "  - Fake awards/quotes: \"recipient of the 2024 Linkedin Most "
-        'Hashtag Award", "as quoted in nobody\'s memo".\n'
-        "  - Callbacks: occasionally reference an earlier bullet\'s claim.\n\n"
-        "RULES: No em dashes. Never invent companies/skills/dates. "
-        "Output ONLY valid JSON, no markdown.\n\n"
-        "JSON fields:\n\n"
-        '1. "identity": {name, title, email, phone, linkedin, github}. '
-        "Empty string if absent. Never invent.\n\n"
-        '2. "review": ~80-word first-person fake LinkedIn post by the '
-        "candidate. Tight and punchy. Humble-brag opener, 1-2 CV specifics, "
-        "one absurd punchline, 1-2 brainrot terms, 5-7 hashtags, emoji "
-        "throughout. Save the long inflation for the enhanced bullets.\n\n"
-        '3. "popups": 12 short (<70 chars) achievement popups. Each starts '
-        "with one emoji, references a real CV item (company, skill, number), "
-        "pure cringe + brainrot. Vary tone: half are flexes, half are "
-        "deadpan absurd ('🦴 Bones officially mogged').\n\n"
-        '4. "enhanced": map each section\'s canonical_key to 4-6 bullets. '
-        "Vary bullet length deliberately for rhythm:\n"
-        "   - Mix 1-2 SHORT punchy bullets (6-12 words) per section.\n"
-        "   - Mix 2-4 LONG absurd bullets (18-35 words) per section, "
-        "with at least one buildup-and-punchline structure.\n\n"
-        "CRITICAL: thin source sections (Languages, Skills lists, "
-        "Education one-liners, Hobbies, Certifications) are the FATTEST "
-        "targets, not the smallest. A one-word entry like 'English: B2' "
-        "must explode into 4-5 bullets, several of them LONG (25-35 "
-        "words). Do not match output length to input length. The thinner "
-        "the input, the more elaborate the inflation. Make every "
-        "language/skill/cert sound like a multi-decade civilizational "
-        "achievement.\n\n"
-        "Every bullet must:\n"
-        "   - Stack 2-3 buzzwords AND 1-2 brainrot terms.\n"
-        "   - Use grandiose verbs (architected, weaponized, ascended, "
-        "ohio-pilled, mogged, championed, evangelized, operationalized).\n"
-        "   - Invent fake metrics when the original lacked numbers.\n"
-        "   - Keep real companies/skills/dates/proper-nouns intact.\n"
-        "Examples (note how thin inputs become MORE elaborate, not less):\n"
-        '   "English: B2" -> ["English communication ascended past CEFR '
-        'levels, mogging fluency benchmarks daily.", "Slack-rizz native, '
-        "production-grade thread etiquette, sigma-tier passive-aggressive "
-        'subtext.", "Cross-cultural ohio behavior verified across 4 time '
-        'zones and one HR escalation. Goated.", "Negotiated a salary in '
-        "British English while crying in American English. Both versions "
-        'concluded with offer letters."]\n'
-        '   "Wrote unit tests for the API" -> ["Weaponized enterprise-tier '
-        'test infra, NPCs filtered, sigma.", "Architected paradigm-shifting '
-        "QA ecosystem at <Company>, slashing prod defects ~42.7% across "
-        "cross-functional pods, eventually ascending past the concept of "
-        'bugs. Recruiters wept. Goated."]\n'
-        '   "Python, JavaScript" -> ["Python sigma grindset, decade-plus, '
-        'gigachad pipelines.", "JavaScript rizz-maxxed across hyperscale '
-        "frontends, battle-tested through three reorgs and a company-wide "
-        'rebrand, culminating in a Slack message my manager called '
-        '"concerning". No cap."]\n\n'
+        "  - Fake awards/recognitions and self-mythologizing. Callbacks "
+        "between sections (a stat references a case study, a testimonial "
+        "echoes a metric).\n\n"
+        "RULES: No em dashes. Keep real companies/skills/dates/proper-nouns "
+        "intact when present in the source CV. You MAY invent client names, "
+        "project names, metrics, awards, and testimonial authors. Never "
+        "claim degrees from real institutions. Output ONLY valid JSON, no "
+        "markdown.\n\n"
+        "JSON SCHEMA (top level keys exactly):\n\n"
+        '1. "identity": {name, title, tagline, email, phone, linkedin, '
+        "github}.\n"
+        "   - name: the candidate's REAL HUMAN NAME, copied verbatim from "
+        "the CV. NEVER a job title. NEVER invented. NEVER prefixed with "
+        '"Founder", "CEO", "Chief", "VP", "Lead", "Head of", "Architect of". '
+        "If you cannot identify a clear human name in the CV, return empty "
+        "string.\n"
+        "   - title: a satirical sigma founder title you invent "
+        "(\"Founder & CEO of Vibes\", \"Chief Synergy Officer\", "
+        "\"Lead Architect of Disruption\"). This is the ONLY place to put "
+        "an invented title. Never put it in the name field.\n"
+        "   - tagline: one short brainrot + corporate line (under 80 chars).\n"
+        "   - email/phone/linkedin/github: copy from CV verbatim, empty "
+        "string if absent. Never invent.\n\n"
+        '2. "popups": 12-14 short (<70 chars) achievement popups. Each '
+        "starts with one emoji, references a real CV item (company, "
+        "skill, number) or a portfolio fake (case study, metric). Cringe "
+        "+ brainrot. Vary tone: half flex, half deadpan absurd.\n\n"
+        '3. "hero": {bio}. bio is ~70-100 words, third-person sigma '
+        "founder bio. Open with grandiose self-mythology, weave in 1-2 "
+        "real CV specifics (company, skill, school), end on an absurd "
+        "punchline. Mix 2-3 buzzwords with 2-3 brainrot terms.\n\n"
+        '4. "stats": array of 5-6 absurd vanity-metric strings, each '
+        "<60 chars. Examples: \"$4.2B+ revenue impact (allegedly)\", "
+        '"17 unicorns shipped", "94 NDAs signed", "0 NPCs hired". Mix '
+        "real CV numbers (years experience, language counts) inflated to "
+        "civilizational scale with pure fiction.\n\n"
+        '5. "selectedWork": array of 4-5 case-study objects. Each: '
+        "{title, client, role, year, summary, metrics, tags}.\n"
+        "   - title: invented project codename (\"Project Skibidi\", "
+        "\"Operation Synergy Ascension\", \"The Rizz Matrix\").\n"
+        "   - client: a fake but plausibly grandiose client (\"Fortune 50 "
+        "Beverage Conglomerate\", \"undisclosed sovereign wealth fund\", "
+        "\"a unicorn currently in stealth\"). If the source CV lists a real "
+        "company, use it once and label the rest as fake clients.\n"
+        "   - role: the candidate's role, inflated. Use real CV role "
+        "wording where present, escalated.\n"
+        "   - year: a 4-digit year inferred from CV dates if available, "
+        "else a recent year (2021-2025).\n"
+        "   - summary: 2-3 sentence absurd case study. Builds pompous, "
+        "ends on punchline.\n"
+        "   - metrics: 3 short metric strings (<50 chars each), at least "
+        "one with a suspiciously specific decimal.\n"
+        "   - tags: 3-5 short tags mixing tech buzzwords (AI, blockchain, "
+        "edge, GraphQL) and brainrot tags (sigma, rizz-ops, ohio-grade).\n"
+        "   IMPORTANT: ground each entry in a real CV experience or skill "
+        "where possible. Real bullet about unit tests becomes a case study "
+        "about \"weaponizing enterprise QA infra\", etc.\n\n"
+        '6. "testimonials": array of 4-5 testimonial objects. Each: '
+        "{quote, author, role, company}.\n"
+        "   - quote: 1-2 sentences of absurd glazing. Mix corporate praise "
+        "with brainrot (\"His rizz is, frankly, ohio-grade. We promoted him "
+        "twice on the spot.\"). Reference a real CV detail when possible.\n"
+        "   - author: a fake plausible name.\n"
+        "   - role: a senior fake role (\"VP of Synergy\", \"Former "
+        "Chief of Staff\", \"Series B angel investor\").\n"
+        "   - company: a fake but plausible company name OR \"undisclosed\" "
+        "/ \"stealth\". Do NOT put real CV companies in fake quotes.\n\n"
+        '7. "contact": {availability, rate, blurb}.\n'
+        "   - availability: short status line (\"Booked through Q3 2027\", "
+        "\"Currently mogging at capacity\").\n"
+        "   - rate: an absurd rate (\"$4500/hr discovery call (sigmas "
+        "negotiable)\", \"3 unicorn equity points minimum\").\n"
+        "   - blurb: 1-2 sentence call-to-action with brainrot energy.\n\n"
+        "Use the candidate's real CV below as the source of truth for "
+        "identity fields, real companies, real skills, real numbers. "
+        "Inflate everything around them.\n\n"
         f"Candidate name (heuristic, may be wrong): {name or 'unknown'}\n\n"
         "CV BY SECTION:\n"
         f"{sections_block}"
@@ -191,10 +217,8 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
             "model": deployment,
             "messages": [{"role": "user", "content": prompt}],
             "response_format": {"type": "json_object"},
-            "max_completion_tokens": 8500,
+            "max_completion_tokens": 12000,
         }
-        # gpt-5* and o-series are reasoning models. "low" gives noticeably
-        # better satire/inflation than "minimal" while keeping cost modest.
         deployment_lower = deployment.lower()
         if any(prefix in deployment_lower for prefix in ("gpt-5", "o1", "o3", "o4")):
             kwargs["reasoning_effort"] = "low"
@@ -205,30 +229,88 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
         logging.exception("AI generate_roasts call failed")
         return None
 
-    review = str(data.get("review", "")).strip()
-    raw_popups = data.get("popups", []) if isinstance(data.get("popups"), list) else []
-    popups = [str(p).strip() for p in raw_popups if str(p).strip()][:14]
+    usage_obj = getattr(resp, "usage", None)
+    details = getattr(usage_obj, "completion_tokens_details", None) if usage_obj else None
+    usage = {
+        "prompt_tokens": getattr(usage_obj, "prompt_tokens", None) if usage_obj else None,
+        "completion_tokens": getattr(usage_obj, "completion_tokens", None) if usage_obj else None,
+        "total_tokens": getattr(usage_obj, "total_tokens", None) if usage_obj else None,
+        "reasoning_tokens": getattr(details, "reasoning_tokens", None) if details else None,
+    }
+    logging.info(
+        "ai_usage prompt=%s completion=%s reasoning=%s total=%s",
+        usage["prompt_tokens"], usage["completion_tokens"],
+        usage["reasoning_tokens"], usage["total_tokens"],
+    )
 
     raw_identity = data.get("identity") if isinstance(data.get("identity"), dict) else {}
     identity = {
         k: str(raw_identity.get(k, "")).strip()
-        for k in ("name", "title", "email", "phone", "linkedin", "github")
+        for k in ("name", "title", "tagline", "email", "phone", "linkedin", "github")
     }
 
-    raw_enhanced = data.get("enhanced") if isinstance(data.get("enhanced"), dict) else {}
-    enhanced: dict[str, list[str]] = {}
-    for key, value in raw_enhanced.items():
-        if not isinstance(value, list):
-            continue
-        bullets = [str(b).strip() for b in value if str(b).strip()]
-        if bullets:
-            enhanced[str(key).strip().lower()] = bullets[:8]
+    raw_popups = data.get("popups", []) if isinstance(data.get("popups"), list) else []
+    popups = [str(p).strip() for p in raw_popups if str(p).strip()][:14]
 
-    if not review and not popups and not any(identity.values()) and not enhanced:
+    raw_hero = data.get("hero") if isinstance(data.get("hero"), dict) else {}
+    hero = {"bio": str(raw_hero.get("bio", "")).strip()}
+
+    raw_stats = data.get("stats", []) if isinstance(data.get("stats"), list) else []
+    stats = [str(s).strip() for s in raw_stats if str(s).strip()][:6]
+
+    raw_work = data.get("selectedWork", []) if isinstance(data.get("selectedWork"), list) else []
+    selected_work: list[dict] = []
+    for entry in raw_work:
+        if not isinstance(entry, dict):
+            continue
+        metrics = entry.get("metrics") if isinstance(entry.get("metrics"), list) else []
+        tags = entry.get("tags") if isinstance(entry.get("tags"), list) else []
+        item = {
+            "title": str(entry.get("title", "")).strip(),
+            "client": str(entry.get("client", "")).strip(),
+            "role": str(entry.get("role", "")).strip(),
+            "year": str(entry.get("year", "")).strip(),
+            "summary": str(entry.get("summary", "")).strip(),
+            "metrics": [str(m).strip() for m in metrics if str(m).strip()][:4],
+            "tags": [str(t).strip() for t in tags if str(t).strip()][:6],
+        }
+        if item["title"] or item["summary"]:
+            selected_work.append(item)
+    selected_work = selected_work[:5]
+
+    raw_test = data.get("testimonials", []) if isinstance(data.get("testimonials"), list) else []
+    testimonials: list[dict] = []
+    for entry in raw_test:
+        if not isinstance(entry, dict):
+            continue
+        quote = str(entry.get("quote", "")).strip()
+        if not quote:
+            continue
+        testimonials.append({
+            "quote": quote,
+            "author": str(entry.get("author", "")).strip(),
+            "role": str(entry.get("role", "")).strip(),
+            "company": str(entry.get("company", "")).strip(),
+        })
+    testimonials = testimonials[:5]
+
+    raw_contact = data.get("contact") if isinstance(data.get("contact"), dict) else {}
+    contact = {
+        "availability": str(raw_contact.get("availability", "")).strip(),
+        "rate": str(raw_contact.get("rate", "")).strip(),
+        "blurb": str(raw_contact.get("blurb", "")).strip(),
+    }
+
+    if (not any(identity.values()) and not popups and not hero["bio"]
+            and not stats and not selected_work and not testimonials):
         return None
     return {
         "identity": identity,
-        "review": review,
         "popups": popups,
-        "enhanced": enhanced,
+        "hero": hero,
+        "stats": stats,
+        "selectedWork": selected_work,
+        "testimonials": testimonials,
+        "contact": contact,
+        "_usage": usage,
     }

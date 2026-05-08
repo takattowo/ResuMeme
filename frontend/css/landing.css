@@ -488,6 +488,22 @@ a { color: inherit; text-decoration: none; }
   margin-right: auto;
 }
 
+.pricing-support {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.pricing-support a {
+  color: #ff5e5b;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px dotted #ff5e5b;
+}
+.pricing-support a:hover { color: #e04340; border-bottom-color: #e04340; }
+
 /* ---------- Content pages (legal, careers) ---------- */
 .content-page {
   max-width: 760px;
@@ -638,6 +654,19 @@ a { color: inherit; text-decoration: none; }
   font-family: 'SF Mono', ui-monospace, 'Courier New', monospace;
 }
 .footer-source:hover { color: #fff; border-color: #5b6a85; }
+
+.footer-kofi {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: #fff;
+  background: #ff5e5b;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.footer-kofi:hover { background: #e04340; color: #fff; }
 
 .footer-cols {
   display: grid;

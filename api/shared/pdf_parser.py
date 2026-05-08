@@ -7,6 +7,7 @@ class ParsedDocument(TypedDict):
     raw_text: str
     images: list[bytes]
     page_count: int
+    author: str
 
 
 def extract_pdf(data: bytes) -> ParsedDocument:
@@ -16,7 +17,8 @@ def extract_pdf(data: bytes) -> ParsedDocument:
         pages_text = [page.get_text("text") for page in doc]
         raw_text = "\n".join(pages_text)
         images = _extract_images(doc)
-        return {"raw_text": raw_text, "images": images, "page_count": len(doc)}
+        author = ((doc.metadata or {}).get("author") or "").strip()
+        return {"raw_text": raw_text, "images": images, "page_count": len(doc), "author": author}
     finally:
         doc.close()
 

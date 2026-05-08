@@ -7,7 +7,7 @@ const root = document.getElementById('cv-root');
 const cvId = (window.location.pathname.match(/\/cv\/([^/]+)/) || [])[1];
 
 if (!cvId) {
-  showFatal('No CV id in URL.');
+  showFatal('No portfolio id in URL.');
 } else {
   load(cvId).catch((err) => showFatal(err.message));
 }
@@ -16,7 +16,7 @@ async function load(id) {
   const resp = await fetch(`/api/cv/${id}`);
   if (resp.status === 404) {
     showFatal(
-      'This CV has been so enhanced it ascended to a higher plane. (Or it expired after 30 days.)'
+      'This portfolio has been so enhanced it ascended to a higher plane. (Or it expired after 30 days.)'
     );
     return;
   }
@@ -42,7 +42,7 @@ function showFatal(message) {
 
 function renderBaseDom(cv) {
   const sections = cv.sections || {};
-  const items = Array.isArray(sections.items) ? sections.items : [];
+  const ai = cv.aiContent || {};
 
   const avatarUrl = (cv.imageUrls || [])[0] || null;
   const avatarFallback = pick(seededRng(cv.id + ':emoji'), ['🤡', '👽', '💀', '🦄', '👻']);
@@ -58,43 +58,35 @@ function renderBaseDom(cv) {
   } else {
     avatarEl.textContent = avatarFallback;
   }
-  root.appendChild(avatarEl);
 
-  root.appendChild(makeIdentityCard(sections, cv.aiContent && cv.aiContent.identity));
+  root.appendChild(makeIdentityCard(sections, ai.identity, avatarEl));
 
-  if (cv.aiContent && cv.aiContent.review) {
-    root.appendChild(makeAiReview(cv.aiContent.review, cv.id));
+  if (ai.hero && ai.hero.bio) {
+    root.appendChild(makeHeroBio(ai.hero.bio, cv.id));
   }
 
-  const enhanced = (cv.aiContent && cv.aiContent.enhanced) || {};
+  if (Array.isArray(ai.stats) && ai.stats.length) {
+    root.appendChild(makeStatsStrip(ai.stats));
+  }
 
-  if (items.length) {
-    for (const item of items) {
-      appendSection(item, enhanced);
-    }
-  } else {
+  if (Array.isArray(ai.selectedWork) && ai.selectedWork.length) {
+    root.appendChild(makeSelectedWork(ai.selectedWork));
+  }
+
+  if (Array.isArray(ai.testimonials) && ai.testimonials.length) {
+    root.appendChild(makeTestimonials(ai.testimonials));
+  }
+
+  if (ai.contact && (ai.contact.availability || ai.contact.rate || ai.contact.blurb)) {
+    root.appendChild(makeContact(ai.contact, ai.identity));
+  }
+
+  // Fallback: if AI returned nothing, show raw text so the page isn't empty.
+  if (!ai.hero && !ai.selectedWork && !ai.testimonials) {
     appendRawText(sections.raw_text || '');
   }
 
   appendActionBar();
-}
-
-function appendSection(item, enhancedMap) {
-  const canonical = item.canonical || item.heading.toLowerCase();
-  const aiBullets = enhancedMap && Array.isArray(enhancedMap[canonical])
-    ? enhancedMap[canonical].filter((s) => typeof s === 'string' && s.trim())
-    : [];
-  const fallback = (item.body || '').split('\n').map((s) => s.trim()).filter(Boolean);
-  const lines = aiBullets.length ? aiBullets : fallback;
-  if (!lines.length) return;
-
-  const section = document.createElement('section');
-  section.dataset.cvSection = canonical;
-  section.appendChild(makeHeading(item.heading.toUpperCase(), canonical));
-  for (const line of lines) {
-    section.appendChild(makeText(line));
-  }
-  root.appendChild(section);
 }
 
 function appendRawText(text) {
@@ -135,54 +127,245 @@ function splitWords(text) {
   return frag;
 }
 
-const REVIEW_EMOJIS = ['💼', '🚀', '⭐', '🏆', '🔥', '🤝', '🎯', '✨', '💎', '🦾'];
-const REVIEW_FONTS = [
+const HERO_FONTS = [
   '"Georgia", "Times New Roman", serif',
   '"Comic Sans MS", "Comic Neue", cursive',
   '"Courier New", monospace',
-  '"Verdana", "Geneva", sans-serif',
   '"Trebuchet MS", "Lucida Sans", sans-serif',
-  '"Palatino Linotype", "Book Antiqua", serif',
 ];
 
-function makeAiReview(reviewText, seedKey) {
-  const card = document.createElement('div');
-  card.className = 'cv-ai-review';
-  card.dataset.cvAiReview = '1';
+function makeHeroBio(bio, seedKey) {
+  const card = document.createElement('section');
+  card.className = 'pf-hero-bio';
+  card.dataset.cvSection = 'hero';
 
-  const localRng = seededRng((seedKey || '') + ':review');
-  const emoji = pick(localRng, REVIEW_EMOJIS);
-  const font = pick(localRng, REVIEW_FONTS);
-  const tilt = randFloat(localRng, -2, 2);
+  const localRng = seededRng((seedKey || '') + ':hero');
+  const font = pick(localRng, HERO_FONTS);
+  const tilt = randFloat(localRng, -1.5, 1.5);
   card.style.transform = `rotate(${tilt}deg)`;
 
   const badge = document.createElement('div');
-  badge.className = 'cv-ai-review-badge';
-  badge.textContent = `${emoji} Why You Should Hire Me`;
+  badge.className = 'pf-hero-badge';
+  badge.textContent = '✨ About the Founder';
   card.appendChild(badge);
 
   const body = document.createElement('p');
-  body.className = 'cv-ai-review-body';
+  body.className = 'pf-hero-body';
   body.style.fontFamily = font;
-  body.textContent = reviewText;
+  body.appendChild(splitWords(bio));
   card.appendChild(body);
 
   return card;
 }
 
-function makeIdentityCard(sections, aiIdentity) {
+function makeStatsStrip(stats) {
+  const section = document.createElement('section');
+  section.className = 'pf-stats';
+  section.dataset.cvSection = 'stats';
+
+  section.appendChild(makeHeading('BY THE NUMBERS', 'stats'));
+
+  const grid = document.createElement('div');
+  grid.className = 'pf-stats-grid';
+  for (const stat of stats) {
+    const chip = document.createElement('div');
+    chip.className = 'pf-stat';
+    chip.appendChild(splitWords(stat));
+    grid.appendChild(chip);
+  }
+  section.appendChild(grid);
+  return section;
+}
+
+function makeSelectedWork(items) {
+  const section = document.createElement('section');
+  section.className = 'pf-work';
+  section.dataset.cvSection = 'experience';
+
+  section.appendChild(makeHeading('SELECTED WORK', 'experience'));
+
+  const grid = document.createElement('div');
+  grid.className = 'pf-work-grid';
+  for (const item of items) {
+    grid.appendChild(makeWorkCard(item));
+  }
+  section.appendChild(grid);
+  return section;
+}
+
+function makeWorkCard(item) {
+  const card = document.createElement('article');
+  card.className = 'pf-work-card';
+
+  const head = document.createElement('div');
+  head.className = 'pf-work-head';
+  if (item.year) {
+    const year = document.createElement('span');
+    year.className = 'pf-work-year';
+    year.textContent = item.year;
+    head.appendChild(year);
+  }
+  if (item.client) {
+    const client = document.createElement('span');
+    client.className = 'pf-work-client';
+    client.textContent = item.client;
+    head.appendChild(client);
+  }
+  card.appendChild(head);
+
+  if (item.title) {
+    const h3 = document.createElement('h3');
+    h3.className = 'pf-work-title';
+    h3.appendChild(splitWords(item.title));
+    card.appendChild(h3);
+  }
+
+  if (item.role) {
+    const role = document.createElement('div');
+    role.className = 'pf-work-role';
+    role.appendChild(splitWords(item.role));
+    card.appendChild(role);
+  }
+
+  if (item.summary) {
+    const p = document.createElement('p');
+    p.className = 'pf-work-summary';
+    p.appendChild(splitWords(item.summary));
+    card.appendChild(p);
+  }
+
+  if (Array.isArray(item.metrics) && item.metrics.length) {
+    const metrics = document.createElement('ul');
+    metrics.className = 'pf-work-metrics';
+    for (const m of item.metrics) {
+      const li = document.createElement('li');
+      li.appendChild(splitWords(m));
+      metrics.appendChild(li);
+    }
+    card.appendChild(metrics);
+  }
+
+  if (Array.isArray(item.tags) && item.tags.length) {
+    const tags = document.createElement('div');
+    tags.className = 'pf-work-tags';
+    for (const t of item.tags) {
+      const tag = document.createElement('span');
+      tag.className = 'pf-tag';
+      tag.textContent = t;
+      tags.appendChild(tag);
+    }
+    card.appendChild(tags);
+  }
+
+  return card;
+}
+
+function makeTestimonials(items) {
+  const section = document.createElement('section');
+  section.className = 'pf-testimonials';
+  section.dataset.cvSection = 'testimonials';
+
+  section.appendChild(makeHeading('WHAT THEY SAY', 'testimonials'));
+
+  const grid = document.createElement('div');
+  grid.className = 'pf-testimonials-grid';
+  for (const t of items) {
+    const card = document.createElement('blockquote');
+    card.className = 'pf-testimonial';
+
+    const q = document.createElement('p');
+    q.className = 'pf-testimonial-quote';
+    q.appendChild(splitWords(`"${t.quote}"`));
+    card.appendChild(q);
+
+    const cite = document.createElement('footer');
+    cite.className = 'pf-testimonial-cite';
+    const parts = [t.author, t.role, t.company].filter(Boolean).join(' · ');
+    if (parts) cite.appendChild(splitWords(parts));
+    card.appendChild(cite);
+
+    grid.appendChild(card);
+  }
+  section.appendChild(grid);
+  return section;
+}
+
+function makeContact(contact, identity) {
+  const section = document.createElement('section');
+  section.className = 'pf-contact';
+  section.dataset.cvSection = 'contact';
+
+  section.appendChild(makeHeading('LET’S COLLABORATE', 'contact'));
+
+  if (contact.availability) {
+    const avail = document.createElement('div');
+    avail.className = 'pf-contact-availability';
+    avail.appendChild(splitWords(contact.availability));
+    section.appendChild(avail);
+  }
+
+  if (contact.rate) {
+    const rate = document.createElement('div');
+    rate.className = 'pf-contact-rate';
+    rate.appendChild(splitWords(contact.rate));
+    section.appendChild(rate);
+  }
+
+  if (contact.blurb) {
+    const blurb = document.createElement('p');
+    blurb.className = 'pf-contact-blurb';
+    blurb.appendChild(splitWords(contact.blurb));
+    section.appendChild(blurb);
+  }
+
+  const links = [
+    identity && identity.email && `mailto:${identity.email}`,
+    identity && identity.linkedin,
+    identity && identity.github,
+  ].filter(Boolean);
+  if (links.length) {
+    const strip = document.createElement('div');
+    strip.className = 'pf-contact-links';
+    for (const href of links) {
+      const a = document.createElement('a');
+      a.href = href.startsWith('http') || href.startsWith('mailto:') ? href : `https://${href}`;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.className = 'cv-contact-chip';
+      a.dataset.cvSpecial = 'contact';
+      a.textContent = href.replace(/^mailto:/, '');
+      strip.appendChild(a);
+    }
+    section.appendChild(strip);
+  }
+
+  return section;
+}
+
+function makeIdentityCard(sections, aiIdentity, avatarEl) {
   const card = document.createElement('div');
   card.className = 'cv-identity';
   card.dataset.cvIdentity = '1';
 
+  if (avatarEl) {
+    const frame = document.createElement('div');
+    frame.className = 'cv-avatar-frame';
+    frame.appendChild(avatarEl);
+    card.appendChild(frame);
+  }
+
   const ai = aiIdentity || {};
   const looksLikePara = (s) => !s || s.length > 80 || /\s\w+\s\w+\s\w+\s\w+/.test(s);
+  const looksLikeTitle = (s) =>
+    !!s && /^(?:founder|co-?founder|ceo|cto|cfo|coo|cmo|chief|vp|svp|evp|head\s+of|lead|director|principal|architect\s+of|president|managing|partner)\b/i.test(s.trim());
 
-  // Prefer AI-extracted name; fall back to heuristic (and reject if it
-  // looks like a paragraph rather than a name).
   const heuristicName = looksLikePara(sections.name) ? '' : sections.name;
-  const name = (ai.name && ai.name.trim()) || heuristicName || '';
+  const aiName = (ai.name && ai.name.trim()) || '';
+  // Reject AI name if it slipped a sigma founder title into the field.
+  const safeAiName = looksLikeTitle(aiName) ? '' : aiName;
+  const name = safeAiName || heuristicName || '';
   const title = (ai.title && ai.title.trim()) || (looksLikePara(sections.title) ? '' : sections.title) || '';
+  const tagline = (ai.tagline && ai.tagline.trim()) || '';
 
   if (name) {
     const el = document.createElement('div');
@@ -196,6 +379,13 @@ function makeIdentityCard(sections, aiIdentity) {
     const el = document.createElement('div');
     el.className = 'cv-identity-title';
     el.textContent = title;
+    card.appendChild(el);
+  }
+
+  if (tagline) {
+    const el = document.createElement('div');
+    el.className = 'cv-identity-tagline';
+    el.textContent = tagline;
     card.appendChild(el);
   }
 
@@ -247,7 +437,7 @@ function appendActionBar() {
 
   const dl = document.createElement('button');
   dl.id = 'btn-download';
-  dl.textContent = '✨ Download Enhanced CV ✨';
+  dl.textContent = '✨ Download Portfolio ✨';
   bar.appendChild(dl);
 
   const sh = document.createElement('button');
@@ -262,7 +452,7 @@ document.addEventListener('click', async (e) => {
   if (!e.target) return;
   if (e.target.id === 'btn-download') {
     e.preventDefault();
-    downloadAsHtml();
+    downloadAsHtml('enhanced-portfolio.html');
   } else if (e.target.id === 'btn-share') {
     try {
       await navigator.clipboard.writeText(window.location.href);

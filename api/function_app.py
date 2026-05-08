@@ -64,10 +64,13 @@ def diag(req: func.HttpRequest) -> func.HttpResponse:
             out["roasts_status"] = "returned None"
         else:
             out["roasts_status"] = "ok"
-            out["roasts_review_chars"] = len(result.get("review", ""))
+            out["roasts_hero_bio_chars"] = len(result.get("hero", {}).get("bio", ""))
             out["roasts_popups_count"] = len(result.get("popups", []))
-            out["roasts_enhanced_keys"] = list(result.get("enhanced", {}).keys())
+            out["roasts_stats_count"] = len(result.get("stats", []))
+            out["roasts_work_count"] = len(result.get("selectedWork", []))
+            out["roasts_testimonials_count"] = len(result.get("testimonials", []))
             out["roasts_identity_name"] = result.get("identity", {}).get("name", "")
+            out["roasts_usage"] = result.get("_usage", {})
     except Exception as e:
         out["roasts_status"] = "exception"
         out["roasts_error_type"] = type(e).__name__
@@ -117,13 +120,13 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
         parsed = extract_pdf(body) if kind == "pdf" else extract_docx(body)
     except Exception:
         logging.exception("parse failure; falling back to raw_text only")
-        parsed = {"raw_text": "", "images": [], "page_count": 1}
+        parsed = {"raw_text": "", "images": [], "page_count": 1, "author": ""}
 
     ok, reason = looks_like_resume(parsed["raw_text"], parsed.get("page_count", 1))
     if not ok:
         return _json_error(422, "not_a_resume", reason)
 
-    sections = split_sections(parsed["raw_text"])
+    sections = split_sections(parsed["raw_text"], fallback_name=parsed.get("author", ""))
 
     # AI is best-effort. None = fall back to generic frontend content.
     ai_content = generate_roasts(

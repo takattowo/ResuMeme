@@ -35,6 +35,65 @@ _BULLET_RE = re.compile(r"^\s*([-•*►▪◦‣⋅▸·]|\d+[.\)])\s")
 _SENTENCE_END = re.compile(r"[.!?][\"')\]]?\s*$")
 _HEADING_CHARS = re.compile(r"^[A-Za-z][A-Za-z\s/&\-:]*$")
 
+# Page header / footer patterns that should never be treated as the candidate's name.
+_PAGE_CHROME_PATTERNS = [
+    re.compile(r"\bpage\s+\d+\s+of\s+\d+\b", re.IGNORECASE),
+    re.compile(r"\bpage\s+\d+\b", re.IGNORECASE),
+    re.compile(r"\bconfidential(?:\s+information)?\b", re.IGNORECASE),
+    re.compile(r"\b(?:curriculum\s+vitae|resum[eé])\b", re.IGNORECASE),
+    re.compile(r"^\s*\d{1,3}\s*$"),
+    re.compile(r"^\s*https?://", re.IGNORECASE),
+    re.compile(r"^\s*[\w.+-]+@[\w.-]+\.\w+\s*$"),
+    re.compile(r"^\s*\+?[\d\s().\-]{7,}\s*$"),
+]
+
+# Lines bearing a corporate suffix are branding, not a person's name.
+_COMPANY_SUFFIX_RE = re.compile(
+    r"\b(?:Technology|Technologies|Inc\.?|Incorporated|Corp\.?|Corporation|Ltd\.?|Limited|"
+    r"LLC|GmbH|AG|Pty|Company|Co\.?|Solutions|Group|Consulting|Services|Holdings|"
+    r"Bank|Foundation|Institute)\b",
+    re.IGNORECASE,
+)
+
+# Letters allowed inside a real human name (Latin + diacritics + Vietnamese ranges).
+_NAME_VALID_CHARS_RE = re.compile(r"^[A-Za-zÀ-ɏḀ-ỿ\s.,'\-]+$")
+
+# Words that signal a job title rather than a person's name.
+_ROLE_KEYWORDS_RE = re.compile(
+    r"\b(?:engineer|developer|programmer|consultant|manager|analyst|designer|"
+    r"architect|specialist|administrator|coordinator|director|officer|intern|"
+    r"associate|assistant|technician|scientist|recruiter|accountant|president|"
+    r"founder|ceo|cto|cfo|coo|cmo|cio|vp|svp|evp|head|chief|lead|principal|"
+    r"manager|owner|partner|advisor|qa|sde|swe|fullstack|frontend|backend)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_page_chrome(line: str) -> bool:
+    s = line.strip()
+    if not s:
+        return False
+    for pat in _PAGE_CHROME_PATTERNS:
+        if pat.search(s):
+            return True
+    if _COMPANY_SUFFIX_RE.search(s):
+        return True
+    return False
+
+
+def _looks_like_human_name(line: str) -> bool:
+    s = line.strip().rstrip(",.")
+    if not (4 <= len(s) <= 50):
+        return False
+    if not _NAME_VALID_CHARS_RE.match(s):
+        return False
+    if _ROLE_KEYWORDS_RE.search(s):
+        return False
+    words = [w for w in re.split(r"[\s,]+", s) if w]
+    if not (2 <= len(words) <= 5):
+        return False
+    return any(w[:1].isupper() for w in words)
+
 
 def _is_known_heading(line: str) -> tuple[bool, str, str]:
     text = line.strip().rstrip(":")
@@ -126,33 +185,61 @@ def _merge_wrapped_lines(text: str) -> str:
     return "\n".join(out)
 
 
-def _extract_name_and_title(lines: list[str]) -> tuple[str, str, int]:
+def _extract_name_and_title(
+    lines: list[str], fallback_name: str = ""
+) -> tuple[str, str, int]:
     """Pull name + title from leading non-empty lines.
 
-    Returns (name, title, content_start_index). Uses ONLY the known-headings
-    list for boundary detection here so generic title-case lines (e.g.,
-    "Senior Software Engineer") aren't mistaken for headings.
+    Skips page-chrome (page numbers, confidentiality notices, corporate
+    headers) before picking a candidate. Falls back to `fallback_name` (e.g.
+    PDF /Author or DOCX core_properties.author) when the document's first
+    visible line doesn't look like a real human name.
     """
+    fb = (fallback_name or "").strip()
     non_empty = [(i, ln.strip()) for i, ln in enumerate(lines) if ln.strip()]
     if not non_empty:
-        return "", "", 0
+        return (fb if _looks_like_human_name(fb) else fb), "", 0
 
-    first_idx, first = non_empty[0]
-    if _is_known_heading(first)[0]:
-        return "", "", first_idx
+    plausible: list[tuple[int, str]] = []
+    first_heading_idx: int | None = None
+    for i, ln in non_empty:
+        if _is_page_chrome(ln):
+            continue
+        if _is_known_heading(ln)[0]:
+            first_heading_idx = i
+            break
+        plausible.append((i, ln))
 
-    name = first
-    if len(non_empty) >= 2:
-        second_idx, second = non_empty[1]
-        if not _is_known_heading(second)[0]:
-            return name, second, second_idx + 1
-        return name, "", second_idx
-    return name, "", first_idx + 1
+    if not plausible:
+        name = fb if _looks_like_human_name(fb) else fb
+        if first_heading_idx is not None:
+            return name, "", first_heading_idx
+        return name, "", non_empty[-1][0] + 1
+
+    cand_i, cand_ln = plausible[0]
+
+    if _looks_like_human_name(cand_ln):
+        name = cand_ln
+        if len(plausible) >= 2:
+            t_i, t_ln = plausible[1]
+            return name, t_ln, t_i + 1
+        return name, "", cand_i + 1
+
+    if fb and _looks_like_human_name(fb):
+        # Metadata wins; current line was likely a job title or junk.
+        return fb, cand_ln, cand_i + 1
+
+    # Legacy fallback: trust the first non-chrome line even if shape is odd.
+    name = cand_ln
+    if len(plausible) >= 2:
+        t_i, t_ln = plausible[1]
+        return name, t_ln, t_i + 1
+    return name, "", cand_i + 1
 
 
-def split_sections(text: str) -> Sections:
+def split_sections(text: str, fallback_name: str = "") -> Sections:
     raw_lines = text.splitlines()
-    name, title, start = _extract_name_and_title(raw_lines)
+    name, title, start = _extract_name_and_title(raw_lines, fallback_name)
 
     body_text = "\n".join(raw_lines[start:])
     merged_body = _merge_wrapped_lines(body_text)

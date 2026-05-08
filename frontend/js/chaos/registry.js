@@ -46,8 +46,10 @@ import wingdingsContact from './effects/wingdingsContact.js';
 import emojiBullets from './effects/emojiBullets.js';
 import refsRoast from './effects/refsRoast.js';
 import avatarRotate from './effects/avatarRotate.js';
-import avatarScatter from './effects/avatarScatter.js';
-import avatarPosition from './effects/avatarPosition.js';
+// avatarScatter + avatarPosition disabled: avatar is now docked inside the
+// identity card as a proper portrait frame, no longer floating.
+// import avatarScatter from './effects/avatarScatter.js';
+// import avatarPosition from './effects/avatarPosition.js';
 import customCursor from './effects/customCursor.js';
 import sectionWobble from './effects/sectionWobble.js';
 import sectionVariety from './effects/sectionVariety.js';
@@ -62,7 +64,6 @@ export const EFFECTS = [
   pageBackground,
   // Variety/positioning effects run early so later transforms can stack on top.
   sectionVariety,
-  avatarPosition,
   // Heading-text rewrites must run before glitch/rainbow/strobe pick targets.
   absurdHeading,
   // Mark some sections as numbered before emojiBullets so the two are
@@ -109,9 +110,8 @@ export const EFFECTS = [
   wingdingsContact,
   emojiBullets,
   refsRoast,
-  // Avatar effects (rotate + scatter run after position).
+  // Avatar effects (rotate only; scatter + position retired).
   avatarRotate,
-  avatarScatter,
   // Interactions.
   customCursor,
   sectionWobble,
