@@ -47,7 +47,9 @@ dropzone.addEventListener('drop', (e) => {
   if (e.dataTransfer && e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
 });
 fileInput.addEventListener('change', (e) => {
-  if (e.target.files.length) handleFile(e.target.files[0]);
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (file) handleFile(file);
 });
 
 // When the browser restores this page from the back/forward cache

@@ -64,6 +64,7 @@ resource swaSettings 'Microsoft.Web/staticSites/config@2023-12-01' = {
   parent: swa
   name: 'appsettings'
   properties: {
+    FUNCTIONS_REQUEST_BODY_SIZE_LIMIT: '6291456'
     STORAGE_CONNECTION_STRING: 'DefaultEndpointsProtocol=https;AccountName=${storage.name};AccountKey=${storage.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
     BLOB_CONTAINER: 'cv-uploads'
   }

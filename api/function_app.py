@@ -36,53 +36,6 @@ def health(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse("ok", status_code=200)
 
 
-@app.route(route="diag", methods=["GET"])
-def diag(req: func.HttpRequest) -> func.HttpResponse:
-    from shared.llm_client import diagnose, generate_roasts
-    out = diagnose()
-
-    # Also exercise the real generate_roasts pipeline with a sample CV.
-    sample_items = [
-        {
-            "heading": "Experience",
-            "canonical": "experience",
-            "body": "Acme Corp - Software Engineer (2022-2024)\nWrote unit tests for the payment API.",
-        },
-        {
-            "heading": "Skills",
-            "canonical": "skills",
-            "body": "Python, JavaScript",
-        },
-    ]
-    try:
-        result = generate_roasts(
-            "Jane Doe\nSoftware Engineer\n\nExperience\nAcme Corp - Software Engineer (2022-2024)",
-            "Jane Doe",
-            sample_items,
-        )
-        if result is None:
-            out["roasts_status"] = "returned None"
-        else:
-            out["roasts_status"] = "ok"
-            out["roasts_hero_bio_chars"] = len(result.get("hero", {}).get("bio", ""))
-            out["roasts_popups_count"] = len(result.get("popups", []))
-            out["roasts_stats_count"] = len(result.get("stats", []))
-            out["roasts_work_count"] = len(result.get("selectedWork", []))
-            out["roasts_testimonials_count"] = len(result.get("testimonials", []))
-            out["roasts_identity_name"] = result.get("identity", {}).get("name", "")
-            out["roasts_usage"] = result.get("_usage", {})
-    except Exception as e:
-        out["roasts_status"] = "exception"
-        out["roasts_error_type"] = type(e).__name__
-        out["roasts_error_message"] = str(e)[:600]
-
-    return func.HttpResponse(
-        body=json.dumps(out),
-        status_code=200,
-        mimetype="application/json",
-    )
-
-
 @app.route(route="upload", methods=["POST"])
 def upload(req: func.HttpRequest) -> func.HttpResponse:
     storage_conn = os.environ.get("STORAGE_CONNECTION_STRING", "")
@@ -115,6 +68,7 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
             "unsupported_type",
             "We only accept PDF or DOCX. Did you try to upload a JPEG of a JPEG?",
         )
+    rate_record(storage_conn, ip)
 
     try:
         parsed = extract_pdf(body) if kind == "pdf" else extract_docx(body)
@@ -152,7 +106,6 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
         "aiContent": ai_content,
     }
     bc.write_json(f"{cv_id}.json", document)
-    rate_record(storage_conn, ip)
 
     return func.HttpResponse(
         body=json.dumps({"id": cv_id, "url": f"/cv/{cv_id}"}),

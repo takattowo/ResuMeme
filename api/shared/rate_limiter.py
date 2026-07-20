@@ -9,6 +9,7 @@ might both pass the check. Acceptable for a meme site at our scale.
 """
 import logging
 from datetime import datetime, timedelta, timezone
+from ipaddress import ip_address
 
 from azure.core.exceptions import ResourceNotFoundError
 from azure.data.tables import TableServiceClient, UpdateMode
@@ -38,9 +39,7 @@ def _today_utc() -> str:
 
 def check(connection_string: str, ip: str) -> tuple[bool, int, str]:
     """Returns (ok, retry_after_seconds, reason_if_blocked)."""
-    if not ip or ip == "unknown":
-        return True, 0, ""
-    pk = _safe_key(ip)
+    pk = _safe_key(ip or "unknown")
     table = _table(connection_string)
 
     # 30s window check.
@@ -72,9 +71,7 @@ def check(connection_string: str, ip: str) -> tuple[bool, int, str]:
 
 def record(connection_string: str, ip: str) -> None:
     """Record an upload attempt. Best-effort; failures are logged and ignored."""
-    if not ip or ip == "unknown":
-        return
-    pk = _safe_key(ip)
+    pk = _safe_key(ip or "unknown")
     table = _table(connection_string)
     now = datetime.now(timezone.utc)
 
@@ -106,21 +103,13 @@ def record(connection_string: str, ip: str) -> None:
 
 
 def client_ip(headers) -> str:
-    """Extract client IP from forwarded headers (case-insensitive)."""
+    """Extract the platform-recorded socket IP, ignoring spoofable headers."""
     if hasattr(headers, "get"):
         getter = headers.get
     else:
         return "unknown"
-    candidates = [
-        getter("x-forwarded-for"),
-        getter("X-Forwarded-For"),
-        getter("x-azure-clientip"),
-        getter("X-Azure-ClientIP"),
-        getter("x-original-forwarded-for"),
-    ]
-    for raw in candidates:
-        if raw:
-            first = raw.split(",")[0].strip()
-            if first:
-                return first
-    return "unknown"
+    raw = getter("x-azure-socketip") or getter("X-Azure-SocketIP")
+    try:
+        return ip_address(raw.strip()).compressed if raw else "unknown"
+    except ValueError:
+        return "unknown"

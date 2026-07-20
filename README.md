@@ -55,7 +55,7 @@ $env:PYTHONPATH = "$PWD"   # PowerShell; bash: export PYTHONPATH=$PWD
 .venv\Scripts\python.exe -m pytest tests/ -v
 ```
 
-44 tests across 7 modules, including blob client and rate limiter integration with Azurite.
+50 tests across 9 modules, including blob client and rate limiter integration with Azurite.
 
 ## Manual smoke test checklist
 
@@ -77,6 +77,8 @@ azd up                    # first time
 azd deploy                # subsequent code-only deploys
 ```
 
+Run `azd provision` after changes under `infra/`; `azd deploy` only updates app code.
+
 After `azd up`, set the four AI env vars on the deployed SWA via the portal (Static Web App, Environment variables):
 
 | Name | Example value |
@@ -97,7 +99,7 @@ frontend/                       Static site (HTML/CSS/JS, no build step)
   js/                           Vanilla JS
   css/                          Stylesheets
 api/                            Azure Functions (Python v2 model)
-  function_app.py               Routes: /upload, /cv/{id}, /health, /diag
+  function_app.py               Routes: /upload, /cv/{id}, /health
   shared/                       Parsers, blob client, rate limiter, LLM client
   tests/                        pytest suite
 infra/                          Bicep templates

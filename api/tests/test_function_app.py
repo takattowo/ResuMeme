@@ -1,3 +1,7 @@
+from io import BytesIO
+from types import SimpleNamespace
+
+import function_app
 from function_app import _content_type_for_image, _detect_kind, ID_PATTERN
 
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n" + b"...rest"
@@ -45,3 +49,28 @@ def test_id_pattern_rejects_invalid():
     assert ID_PATTERN.match("waaaaaaaaaaaaaaaaaaay-too-long") is None
     assert ID_PATTERN.match("has spaces") is None
     assert ID_PATTERN.match("has/slash") is None
+
+
+def test_upload_records_attempt_before_parsing(monkeypatch):
+    events = []
+    monkeypatch.setattr(function_app, "client_ip", lambda _headers: "198.51.100.1")
+    monkeypatch.setattr(function_app, "rate_check", lambda _conn, _ip: (True, 0, ""))
+    monkeypatch.setattr(function_app, "rate_record", lambda _conn, _ip: events.append("record"))
+    monkeypatch.setattr(
+        function_app,
+        "extract_pdf",
+        lambda _body: events.append("parse") or {
+            "raw_text": "not a resume",
+            "images": [],
+            "page_count": 1,
+            "author": "",
+        },
+    )
+    monkeypatch.setattr(function_app, "looks_like_resume", lambda _text, _pages: (False, "no"))
+
+    response = function_app.upload(
+        SimpleNamespace(headers={}, files={"file": BytesIO(b"%PDF-1.4")})
+    )
+
+    assert response.status_code == 422
+    assert events == ["record", "parse"]

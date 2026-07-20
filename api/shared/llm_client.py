@@ -15,7 +15,7 @@ try:
 except ImportError:
     _SDK_OK = False
 
-_TIMEOUT_SECONDS = 35
+_TIMEOUT_SECONDS = 25
 
 
 def _client():
@@ -31,6 +31,7 @@ def _client():
             api_version=os.environ.get("AZURE_OPENAI_API_VERSION", "2024-08-01-preview"),
             azure_endpoint=endpoint,
             timeout=_TIMEOUT_SECONDS,
+            max_retries=0,
         )
     except Exception:
         logging.exception("AzureOpenAI client construction failed")
@@ -39,58 +40,6 @@ def _client():
 
 def _deployment() -> Optional[str]:
     return os.environ.get("AZURE_OPENAI_DEPLOYMENT")
-
-
-def diagnose() -> dict:
-    """Return AI configuration status plus the result of a tiny test call.
-
-    Used by /api/diag for one-shot debugging when Application Insights is
-    not available. Never returns the actual API key.
-    """
-    out: dict = {
-        "sdk_available": _SDK_OK,
-        "endpoint_set": bool(os.environ.get("AZURE_OPENAI_ENDPOINT")),
-        "key_set": bool(os.environ.get("AZURE_OPENAI_KEY")),
-        "deployment_set": bool(os.environ.get("AZURE_OPENAI_DEPLOYMENT")),
-        "deployment_name": os.environ.get("AZURE_OPENAI_DEPLOYMENT", ""),
-        "api_version": os.environ.get("AZURE_OPENAI_API_VERSION", "(default)"),
-    }
-    client = _client()
-    if client is None:
-        out["test_call_status"] = "skipped"
-        out["reason"] = "client construction failed (missing config or SDK)"
-        return out
-    deployment = _deployment()
-    if not deployment:
-        out["test_call_status"] = "skipped"
-        out["reason"] = "AZURE_OPENAI_DEPLOYMENT not set"
-        return out
-    try:
-        kwargs: dict = {
-            "model": deployment,
-            "messages": [
-                {"role": "user", "content": 'Reply with the JSON {"ok": true} and nothing else.'}
-            ],
-            "response_format": {"type": "json_object"},
-            "max_completion_tokens": 4000,
-        }
-        if any(p in deployment.lower() for p in ("gpt-5", "o1", "o3", "o4")):
-            kwargs["reasoning_effort"] = "minimal"
-        resp = client.chat.completions.create(**kwargs)
-        out["test_call_status"] = "ok"
-        out["response_preview"] = (resp.choices[0].message.content or "")[:300]
-        out["finish_reason"] = resp.choices[0].finish_reason
-        out["completion_tokens"] = resp.usage.completion_tokens if resp.usage else None
-        out["reasoning_tokens"] = (
-            resp.usage.completion_tokens_details.reasoning_tokens
-            if resp.usage and resp.usage.completion_tokens_details
-            else None
-        )
-    except Exception as e:
-        out["test_call_status"] = "error"
-        out["error_type"] = type(e).__name__
-        out["error_message"] = str(e)[:600]
-    return out
 
 
 def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optional[dict]:
@@ -110,7 +59,7 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
         sections_block = "\n\n".join(
             f"### {it['heading']} (canonical_key: {it['canonical']})\n{it['body']}"
             for it in items
-        )
+        )[:6000]
     else:
         sections_block = f"(no parsed sections; raw text)\n{text[:6000]}"
 
@@ -207,7 +156,7 @@ def generate_roasts(text: str, name: str, items: Optional[list] = None) -> Optio
         "Use the candidate's real CV below as the source of truth for "
         "identity fields, real companies, real skills, real numbers. "
         "Inflate everything around them.\n\n"
-        f"Candidate name (heuristic, may be wrong): {name or 'unknown'}\n\n"
+        f"Candidate name (heuristic, may be wrong): {name[:200] or 'unknown'}\n\n"
         "CV BY SECTION:\n"
         f"{sections_block}"
     )

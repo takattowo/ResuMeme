@@ -9,8 +9,10 @@ export default {
     if (!BULLET_SECTIONS.includes(el.dataset.cvSection)) return;
     if (el.classList.contains('fx-numbered-section')) return;
     for (const p of el.querySelectorAll('p')) {
-      const bullet = pick(rng, BULLETS);
-      p.textContent = `${bullet} ${p.textContent}`;
+      const bullet = document.createElement('span');
+      bullet.setAttribute('aria-hidden', 'true');
+      bullet.textContent = `${pick(rng, BULLETS)} `;
+      p.prepend(bullet);
     }
   },
 };
