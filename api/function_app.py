@@ -9,7 +9,7 @@ import azure.functions as func
 from shared.blob_client import BlobClient
 from shared.docx_parser import extract_docx
 from shared.id_gen import generate_id
-from shared.llm_client import generate_roasts
+from shared.llm_client import generate_portfolio
 from shared.pdf_parser import extract_pdf
 from shared.rate_limiter import check as rate_check, client_ip, record as rate_record
 from shared.resume_filter import looks_like_resume
@@ -89,14 +89,12 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
 
     sections = split_sections(parsed["raw_text"], fallback_name=parsed.get("author", ""))
 
-    # Real portfolio modes use parsed source text; only explicit chaos needs AI.
-    ai_content = None
-    if presentation_mode == "chaos":
-        ai_content = generate_roasts(
-            parsed["raw_text"],
-            sections.get("name", ""),
-            sections.get("items", []),
-        )
+    ai_content = generate_portfolio(
+        parsed["raw_text"],
+        sections.get("name", ""),
+        sections.get("items", []),
+        presentation_mode,
+    )
 
     cv_id = generate_id()
     image_paths: list[str] = []

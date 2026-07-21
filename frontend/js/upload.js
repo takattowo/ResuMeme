@@ -18,11 +18,13 @@ const CHAOS_LOADING_MESSAGES = [
 ];
 
 const PORTFOLIO_LOADING_MESSAGES = [
-  { text: 'Uploading your CV securely…', ms: 1000 },
-  { text: 'Parsing document structure…', ms: 1200 },
-  { text: 'Arranging your experience and projects…', ms: 1200 },
-  { text: 'Polishing the portfolio layout…', ms: 1200 },
-  { text: 'Publishing your shareable page…', ms: 1200 },
+  { text: 'Uploading your CV securely…', ms: 1500 },
+  { text: 'Parsing document structure…', ms: 1800 },
+  { text: 'Identifying the real person behind the page headers…', ms: 2500 },
+  { text: 'AI-curating experience and project highlights…', ms: 3500 },
+  { text: 'Checking the rewrite against source facts…', ms: 2500 },
+  { text: 'Selecting a visual direction…', ms: 1800 },
+  { text: 'Publishing your shareable page…', ms: 1800 },
 ];
 
 const dropzone = document.getElementById('upload-zone');

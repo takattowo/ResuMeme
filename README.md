@@ -2,14 +2,14 @@
 
 Live on: https://black-desert-031be090f.7.azurestaticapps.net/
 
-A small project for learning the Azure stack end-to-end: Static Web Apps, managed Functions, Blob Storage, and Azure OpenAI. The app parses an uploaded CV (PDF or DOCX), then builds a source-faithful Modern or Professional portfolio, or sends it through an LLM for the original satirical Chaos mode. It deploys via `azd` to a Free-tier SWA + Standard LRS storage account, and authenticates to Azure OpenAI with a key when Chaos is used.
+A small project for learning the Azure stack end-to-end: Static Web Apps, managed Functions, Blob Storage, and Azure OpenAI. The app parses an uploaded CV (PDF or DOCX), then uses mode-specific AI generation to build a source-grounded Modern or Professional portfolio or the original satirical Chaos result. Each approach selects a deterministic visual variant from its own theme and layout pool. It deploys via `azd` to a Free-tier SWA + Standard LRS storage account.
 
 ## Stack
 
 - **Frontend:** vanilla HTML/CSS/JS on Azure Static Web Apps
 - **Backend:** Python 3.11 Azure Functions (managed by SWA, Python v2 programming model)
 - **Storage:** Azure Blob Storage with a 30-day lifecycle policy
-- **AI:** Azure OpenAI for opt-in Chaos mode (model deployment configurable via env var)
+- **AI:** Azure OpenAI with factual Modern/Professional prompts and a satirical Chaos prompt
 - **IaC:** Bicep, deployed with the Azure Developer CLI (`azd`)
 
 ## Local development
@@ -59,14 +59,15 @@ cd ..
 npm test
 ```
 
-57 backend tests across 9 modules, including blob client and rate limiter integration with Azurite.
+64 backend tests across 9 modules, including blob client and rate limiter integration with Azurite.
 
 ## Manual smoke test checklist
 
 - [ ] Upload a PDF, renders the result at `/cv/<id>`
 - [ ] Upload a DOCX, renders the result at `/cv/<id>`
 - [ ] File selection opens the Modern / Professional / Chaos dialog
-- [ ] Modern and Professional preserve source CV content without chaos effects
+- [ ] Modern and Professional produce source-grounded AI content without chaos effects
+- [ ] Fixed sample IDs cover all four seeded Modern and Professional variants
 - [ ] Chaos generates satirical content and applies seeded effects
 - [ ] Reload the result page, output is identical (deterministic per id)
 - [ ] Copy the share link, opens correctly in incognito
@@ -86,7 +87,7 @@ azd deploy                # subsequent code-only deploys
 
 Run `azd provision` after changes under `infra/`; `azd deploy` only updates app code.
 
-To enable Chaos mode, set the four AI env vars on the deployed SWA via the portal (Static Web App, Environment variables). Modern and Professional work without them:
+Set the four AI environment variables on the deployed SWA via the portal (Static Web App, Environment variables). All three presentation modes use them:
 
 | Name | Example value |
 |---|---|

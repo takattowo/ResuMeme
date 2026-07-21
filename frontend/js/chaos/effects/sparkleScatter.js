@@ -9,8 +9,8 @@ export default {
       const s = document.createElement('span');
       s.className = 'fx-sparkle';
       s.textContent = pick(rng, EMOJI);
-      s.style.top = `${randInt(rng, 0, 100)}vh`;
-      s.style.left = `${randInt(rng, 0, 100)}vw`;
+      s.style.top = `clamp(1.5rem, ${randInt(rng, 0, 100)}vh, calc(100% - 3rem))`;
+      s.style.left = `clamp(1.5rem, ${randInt(rng, 0, 100)}vw, calc(100% - 3rem))`;
       s.style.transform = `rotate(${randInt(rng, 0, 360)}deg)`;
       document.body.appendChild(s);
     }

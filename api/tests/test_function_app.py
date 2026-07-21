@@ -104,13 +104,17 @@ def test_upload_records_attempt_before_parsing(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    ("mode", "expects_ai"),
-    [("modern", False), ("professional", False), ("chaos", True)],
+    "mode",
+    ["modern", "professional", "chaos"],
 )
-def test_upload_persists_mode_and_only_uses_ai_for_chaos(monkeypatch, mode, expects_ai):
+@pytest.mark.parametrize(
+    "ai_result",
+    [{"hero": {"bio": "Generated portfolio"}}, None],
+    ids=["ai-success", "ai-fallback"],
+)
+def test_upload_uses_ai_once_and_persists_mode_and_content(monkeypatch, mode, ai_result):
     written = {}
     ai_calls = []
-    ai_result = {"hero": {"bio": "Invented chaos"}}
     monkeypatch.setattr(function_app, "client_ip", lambda _headers: "198.51.100.1")
     monkeypatch.setattr(function_app, "rate_check", lambda _conn, _ip: (True, 0, ""))
     monkeypatch.setattr(function_app, "rate_record", lambda _conn, _ip: None)
@@ -132,8 +136,10 @@ def test_upload_persists_mode_and_only_uses_ai_for_chaos(monkeypatch, mode, expe
     )
     monkeypatch.setattr(
         function_app,
-        "generate_roasts",
-        lambda *_args: ai_calls.append(True) or ai_result,
+        "generate_portfolio",
+        lambda text, name, items, presentation: (
+            ai_calls.append((text, name, items, presentation)) or ai_result
+        ),
     )
     monkeypatch.setattr(function_app, "generate_id", lambda: "Style123")
     monkeypatch.setattr(
@@ -155,5 +161,6 @@ def test_upload_persists_mode_and_only_uses_ai_for_chaos(monkeypatch, mode, expe
     assert response.status_code == 200
     assert written["path"] == "Style123.json"
     assert written["document"]["presentationMode"] == mode
-    assert written["document"]["aiContent"] == (ai_result if expects_ai else None)
-    assert bool(ai_calls) is expects_ai
+    assert written["document"]["aiContent"] == ai_result
+    assert len(ai_calls) == 1
+    assert ai_calls[0][1:] == ("Test User", [], mode)

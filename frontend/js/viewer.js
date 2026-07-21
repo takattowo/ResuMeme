@@ -53,10 +53,12 @@ function applyPresentation(id, mode) {
 
   const presentation = getPresentation(id, Array.from(groups.keys()), mode);
   root.dataset.mode = presentation.mode;
+  root.dataset.variant = presentation.variant;
   root.dataset.theme = presentation.theme;
   root.dataset.style = presentation.style;
   root.dataset.layout = presentation.layout;
   document.body.dataset.presentationMode = presentation.mode;
+  document.body.dataset.presentationVariant = presentation.variant;
 
   for (const section of presentation.sectionOrder) {
     for (const node of groups.get(section)) root.appendChild(node);
@@ -89,40 +91,51 @@ function renderBaseDom(cv) {
 
   root.appendChild(makeIdentityCard(
     sections,
-    mode === 'chaos' ? ai.identity : null,
+    ai.identity,
     avatarEl,
     mode
   ));
 
-  if (mode !== 'chaos') {
-    appendSourcePortfolio(sections);
+  const hasAiPortfolio = Boolean(
+    ai.hero?.bio
+    || (Array.isArray(ai.stats) && ai.stats.length)
+    || (Array.isArray(ai.selectedWork) && ai.selectedWork.length)
+  );
+
+  if (!hasAiPortfolio) {
+    if (mode === 'chaos') appendRawText(sections.raw_text || '');
+    else appendSourcePortfolio(sections);
     appendActionBar(mode);
     return;
   }
 
-  if (ai.hero && ai.hero.bio) {
+  if (ai.hero?.bio) {
     root.appendChild(makeHeroBio(ai.hero.bio, cv.id, mode));
   }
 
   if (Array.isArray(ai.stats) && ai.stats.length) {
-    root.appendChild(makeStatsStrip(ai.stats));
+    root.appendChild(makeStatsStrip(ai.stats, mode));
   }
 
-  if (Array.isArray(ai.selectedWork) && ai.selectedWork.length) {
-    root.appendChild(makeSelectedWork(ai.selectedWork));
+  const hasSelectedWork = Array.isArray(ai.selectedWork) && ai.selectedWork.length;
+  if (hasSelectedWork) {
+    root.appendChild(makeSelectedWork(ai.selectedWork, mode));
   }
 
-  if (Array.isArray(ai.testimonials) && ai.testimonials.length) {
-    root.appendChild(makeTestimonials(ai.testimonials));
+  if (mode !== 'chaos' && !hasSelectedWork) {
+    appendSourcePortfolio(sections);
   }
 
-  if (ai.contact && (ai.contact.availability || ai.contact.rate || ai.contact.blurb)) {
-    root.appendChild(makeContact(ai.contact, ai.identity));
+  if (mode === 'chaos' && Array.isArray(ai.testimonials) && ai.testimonials.length) {
+    root.appendChild(makeTestimonials(ai.testimonials, mode));
   }
 
-  // Fallback: if AI returned nothing, show raw text so the page isn't empty.
-  if (!ai.hero && !ai.selectedWork && !ai.testimonials) {
-    appendRawText(sections.raw_text || '');
+  const hasVisibleContact = ai.contact && (
+    ai.contact.blurb
+    || (mode === 'chaos' && (ai.contact.availability || ai.contact.rate))
+  );
+  if (hasVisibleContact) {
+    root.appendChild(makeContact(ai.contact, ai.identity, mode, sections.raw_text || ''));
   }
 
   appendActionBar(mode);
@@ -294,7 +307,9 @@ function makeHeroBio(bio, seedKey, mode) {
 
   const badge = document.createElement('div');
   badge.className = 'pf-hero-badge';
-  badge.textContent = '✨ About the Founder';
+  badge.textContent = mode === 'chaos'
+    ? '✨ About the Founder'
+    : mode === 'modern' ? 'Profile / 01' : 'Executive profile';
   card.appendChild(badge);
 
   const body = document.createElement('p');
@@ -306,12 +321,12 @@ function makeHeroBio(bio, seedKey, mode) {
   return card;
 }
 
-function makeStatsStrip(stats) {
+function makeStatsStrip(stats, mode = 'chaos') {
   const section = document.createElement('section');
   section.className = 'pf-stats';
   section.dataset.cvSection = 'stats';
 
-  section.appendChild(makeHeading('BY THE NUMBERS', 'stats'));
+  section.appendChild(makeHeading(mode === 'chaos' ? 'BY THE NUMBERS' : 'CAREER HIGHLIGHTS', 'stats'));
 
   const grid = document.createElement('div');
   grid.className = 'pf-stats-grid';
@@ -325,12 +340,12 @@ function makeStatsStrip(stats) {
   return section;
 }
 
-function makeSelectedWork(items) {
+function makeSelectedWork(items, mode = 'chaos') {
   const section = document.createElement('section');
   section.className = 'pf-work';
   section.dataset.cvSection = 'experience';
 
-  section.appendChild(makeHeading('SELECTED WORK', 'experience'));
+  section.appendChild(makeHeading(mode === 'chaos' ? 'SELECTED WORK' : 'SELECTED EXPERIENCE', 'experience'));
 
   const grid = document.createElement('div');
   grid.className = 'pf-work-grid';
@@ -408,12 +423,12 @@ function makeWorkCard(item) {
   return card;
 }
 
-function makeTestimonials(items) {
+function makeTestimonials(items, mode = 'chaos') {
   const section = document.createElement('section');
   section.className = 'pf-testimonials';
   section.dataset.cvSection = 'testimonials';
 
-  section.appendChild(makeHeading('WHAT THEY SAY', 'testimonials'));
+  section.appendChild(makeHeading(mode === 'chaos' ? 'WHAT THEY SAY' : 'RECOMMENDATIONS', 'testimonials'));
 
   const grid = document.createElement('div');
   grid.className = 'pf-testimonials-grid';
@@ -438,21 +453,21 @@ function makeTestimonials(items) {
   return section;
 }
 
-function makeContact(contact, identity) {
+function makeContact(contact, identity, mode = 'chaos', sourceText = '') {
   const section = document.createElement('section');
   section.className = 'pf-contact';
   section.dataset.cvSection = 'contact';
 
-  section.appendChild(makeHeading('LET’S COLLABORATE', 'contact'));
+  section.appendChild(makeHeading(mode === 'chaos' ? 'LET’S COLLABORATE' : 'GET IN TOUCH', 'contact'));
 
-  if (contact.availability) {
+  if (mode === 'chaos' && contact.availability) {
     const avail = document.createElement('div');
     avail.className = 'pf-contact-availability';
     avail.appendChild(splitWords(contact.availability));
     section.appendChild(avail);
   }
 
-  if (contact.rate) {
+  if (mode === 'chaos' && contact.rate) {
     const rate = document.createElement('div');
     rate.className = 'pf-contact-rate';
     rate.appendChild(splitWords(contact.rate));
@@ -466,25 +481,23 @@ function makeContact(contact, identity) {
     section.appendChild(blurb);
   }
 
-  const links = [
-    identity && identity.email && `mailto:${identity.email}`,
-    identity && identity.linkedin,
-    identity && identity.github,
-  ].filter(Boolean);
-  if (links.length) {
+  const contacts = verifiedContacts(identity, sourceText, mode);
+  if (contacts.length) {
     const strip = document.createElement('div');
     strip.className = 'pf-contact-links';
-    for (const href of links) {
+    for (const value of contacts) {
+      const href = contactHref(value);
+      if (!href) continue;
       const a = document.createElement('a');
-      a.href = href.startsWith('http') || href.startsWith('mailto:') ? href : `https://${href}`;
+      a.href = href;
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
       a.className = 'cv-contact-chip';
       a.dataset.cvSpecial = 'contact';
-      a.textContent = href.replace(/^mailto:/, '');
+      a.textContent = value;
       strip.appendChild(a);
     }
-    section.appendChild(strip);
+    if (strip.childElementCount) section.appendChild(strip);
   }
 
   return section;
@@ -514,10 +527,9 @@ function makeIdentityCard(sections, aiIdentity, avatarEl, mode = 'chaos') {
   const aiName = (ai.name && ai.name.trim()) || '';
   // Reject AI name if it slipped a sigma founder title into the field.
   const safeAiName = looksLikeTitle(aiName) ? '' : aiName;
-  const name = mode === 'chaos' ? safeAiName || heuristicName : sourceName;
-  const title = mode === 'chaos'
-    ? (ai.title && ai.title.trim()) || (looksLikePara(sourceTitle) ? '' : sourceTitle)
-    : sourceTitle;
+  const name = safeAiName || (mode === 'chaos' ? heuristicName : sourceName);
+  const title = (ai.title && ai.title.trim())
+    || (mode === 'chaos' && looksLikePara(sourceTitle) ? '' : sourceTitle);
   const tagline = (ai.tagline && ai.tagline.trim()) || '';
 
   if (name) {
@@ -542,9 +554,7 @@ function makeIdentityCard(sections, aiIdentity, avatarEl, mode = 'chaos') {
     card.appendChild(el);
   }
 
-  const aiContacts = [ai.email, ai.phone, ai.linkedin, ai.github]
-    .filter((s) => s && String(s).trim());
-  const contacts = aiContacts.length ? aiContacts : extractContacts(sections.raw_text || '');
+  const contacts = verifiedContacts(ai, sections.raw_text || '', mode);
   if (contacts.length) {
     const strip = document.createElement('div');
     strip.className = 'cv-identity-contacts';
@@ -570,6 +580,38 @@ function contactHref(value) {
   }
   const digits = value.replace(/\D/g, '');
   return digits.length >= 7 ? `tel:${value.replace(/[^+\d]/g, '')}` : '';
+}
+
+function contactKey(value) {
+  const href = contactHref(value);
+  if (href.startsWith('mailto:')) return href.toLowerCase();
+  if (href.startsWith('tel:')) return `tel:${href.replace(/\D/g, '')}`;
+  if (href.startsWith('http')) {
+    return href.toLowerCase().replace(/^https?:\/\/(?:www\.)?/, '').replace(/\/$/, '');
+  }
+  return '';
+}
+
+function verifiedContacts(aiIdentity, sourceText, mode) {
+  const ai = aiIdentity || {};
+  const aiContacts = [ai.email, ai.phone, ai.linkedin, ai.github]
+    .filter((value) => value && String(value).trim())
+    .map(String);
+  const sourceContacts = extractContacts(sourceText);
+  if (mode === 'chaos') return aiContacts.length ? aiContacts : sourceContacts;
+
+  const sourceKeys = new Set(sourceContacts.map(contactKey).filter(Boolean));
+  const merged = [
+    ...aiContacts.filter((value) => sourceKeys.has(contactKey(value))),
+    ...sourceContacts,
+  ];
+  const seen = new Set();
+  return merged.filter((value) => {
+    const key = contactKey(value);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function extractContacts(text) {

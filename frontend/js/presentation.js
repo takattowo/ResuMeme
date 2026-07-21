@@ -22,9 +22,19 @@ export const LAYOUTS = Object.freeze({
 
 const LAYOUT_NAMES = Object.freeze(Object.keys(LAYOUTS));
 
-const PRESETS = Object.freeze({
-  modern: Object.freeze({ theme: 'blueprint', style: 'polished', layout: 'split' }),
-  professional: Object.freeze({ theme: 'boardroom', style: 'editorial', layout: 'classic' }),
+export const MODE_VARIANTS = Object.freeze({
+  modern: Object.freeze([
+    Object.freeze({ variant: 'neon-grid', theme: 'blueprint', style: 'polished', layout: 'split' }),
+    Object.freeze({ variant: 'creative-studio', theme: 'bubblegum', style: 'polished', layout: 'magazine' }),
+    Object.freeze({ variant: 'mono-tech', theme: 'terminal', style: 'retro', layout: 'dashboard' }),
+    Object.freeze({ variant: 'bold-poster', theme: 'tabloid', style: 'brutal', layout: 'magazine' }),
+  ]),
+  professional: Object.freeze([
+    Object.freeze({ variant: 'executive', theme: 'boardroom', style: 'editorial', layout: 'classic' }),
+    Object.freeze({ variant: 'consulting', theme: 'boardroom', style: 'polished', layout: 'split' }),
+    Object.freeze({ variant: 'editorial', theme: 'tabloid', style: 'editorial', layout: 'magazine' }),
+    Object.freeze({ variant: 'technical', theme: 'boardroom', style: 'polished', layout: 'dashboard' }),
+  ]),
 });
 
 export function normalizePresentationMode(mode) {
@@ -34,11 +44,14 @@ export function normalizePresentationMode(mode) {
 export function getPresentation(id, sections = [], requestedMode = 'chaos') {
   const seed = String(id ?? '');
   const mode = normalizePresentationMode(requestedMode);
-  const preset = PRESETS[mode];
+  const preset = MODE_VARIANTS[mode]
+    ? pick(seededRng(`${seed}:${mode}:variant:v2`), MODE_VARIANTS[mode])
+    : null;
   const layout = preset?.layout || pick(seededRng(`${seed}:layout:v1`), LAYOUT_NAMES);
 
   return {
     mode,
+    variant: preset?.variant || 'chaos',
     theme: preset?.theme || pick(seededRng(`${seed}:theme:v1`), THEMES),
     style: preset?.style || pick(seededRng(`${seed}:style:v1`), STYLES),
     layout,

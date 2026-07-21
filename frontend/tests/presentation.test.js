@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   LAYOUTS,
+  MODE_VARIANTS,
   PRESENTATION_MODES,
   STYLES,
   THEMES,
@@ -12,6 +13,21 @@ import {
 } from '../js/presentation.js';
 
 test('presentation choices and section orders are deterministic, valid, and diverse', () => {
+  assert.deepEqual(MODE_VARIANTS, {
+    modern: [
+      { variant: 'neon-grid', theme: 'blueprint', style: 'polished', layout: 'split' },
+      { variant: 'creative-studio', theme: 'bubblegum', style: 'polished', layout: 'magazine' },
+      { variant: 'mono-tech', theme: 'terminal', style: 'retro', layout: 'dashboard' },
+      { variant: 'bold-poster', theme: 'tabloid', style: 'brutal', layout: 'magazine' },
+    ],
+    professional: [
+      { variant: 'executive', theme: 'boardroom', style: 'editorial', layout: 'classic' },
+      { variant: 'consulting', theme: 'boardroom', style: 'polished', layout: 'split' },
+      { variant: 'editorial', theme: 'tabloid', style: 'editorial', layout: 'magazine' },
+      { variant: 'technical', theme: 'boardroom', style: 'polished', layout: 'dashboard' },
+    ],
+  });
+
   const sections = [
     'contact',
     'actions',
@@ -32,6 +48,7 @@ test('presentation choices and section orders are deterministic, valid, and dive
     const choice = choices[index];
     assert.deepEqual(choice, getPresentation(`portfolio-${index}`, sections));
     assert.equal(choice.mode, 'chaos');
+    assert.equal(choice.variant, 'chaos');
     assert.ok(THEMES.includes(choice.theme));
     assert.ok(STYLES.includes(choice.style));
     assert.ok(Object.hasOwn(LAYOUTS, choice.layout));
@@ -62,26 +79,30 @@ test('presentation choices and section orders are deterministic, valid, and dive
 
   assert.deepEqual(getPresentation('stable-link', sections), {
     mode: 'chaos',
+    variant: 'chaos',
     theme: 'boardroom',
     style: 'editorial',
     layout: 'classic',
     sectionOrder: expected.classic,
   });
 
-  assert.deepEqual(getPresentation('any-link', sections, 'modern'), {
-    mode: 'modern',
-    theme: 'blueprint',
-    style: 'polished',
-    layout: 'split',
-    sectionOrder: expected.split,
-  });
-  assert.deepEqual(getPresentation('any-link', sections, 'professional'), {
-    mode: 'professional',
-    theme: 'boardroom',
-    style: 'editorial',
-    layout: 'classic',
-    sectionOrder: expected.classic,
-  });
+  for (const mode of ['modern', 'professional']) {
+    const modeChoices = Array.from({ length: 512 }, (_, index) =>
+      getPresentation(`${mode}-${index}`, sections, mode)
+    );
+    assert.equal(
+      new Set(modeChoices.map(({ variant }) => variant)).size,
+      MODE_VARIANTS[mode].length
+    );
+    for (let index = 0; index < modeChoices.length; index++) {
+      const choice = modeChoices[index];
+      assert.equal(choice.mode, mode);
+      assert.ok(MODE_VARIANTS[mode].some(({ variant }) => variant === choice.variant));
+      assert.deepEqual(choice, getPresentation(`${mode}-${index}`, sections, mode));
+      assert.equal(choice.sectionOrder[0], 'identity');
+      assert.equal(choice.sectionOrder.at(-1), 'actions');
+    }
+  }
   assert.deepEqual(PRESENTATION_MODES, ['modern', 'professional', 'chaos']);
   assert.equal(normalizePresentationMode('definitely-real'), 'chaos');
 });
