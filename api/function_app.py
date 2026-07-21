@@ -110,7 +110,7 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
         "sections": sections,
         "images": image_paths,
         "ownerId": None,
-        "aiContent": ai_content,
+        "aiContent": ai_content or {},
         "presentationMode": presentation_mode,
     }
     bc.write_json(f"{cv_id}.json", document)
@@ -137,6 +137,16 @@ def get_cv(req: func.HttpRequest) -> func.HttpResponse:
             "not_found",
             "This CV has been so enhanced it ascended to a higher plane.",
         )
+
+    if document.get("aiContent") is None:
+        sections = document.get("sections") or {}
+        document["aiContent"] = generate_portfolio(
+            sections.get("raw_text", ""),
+            sections.get("name", ""),
+            sections.get("items", []),
+            _presentation_mode(document.get("presentationMode")) or "modern",
+        ) or {}
+        bc.write_json(f"{cv_id}.json", document)
 
     image_urls: list[str] = []
     for path in document.get("images", []):

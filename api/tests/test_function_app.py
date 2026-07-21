@@ -1,3 +1,4 @@
+import json
 from io import BytesIO
 from types import SimpleNamespace
 
@@ -161,6 +162,48 @@ def test_upload_uses_ai_once_and_persists_mode_and_content(monkeypatch, mode, ai
     assert response.status_code == 200
     assert written["path"] == "Style123.json"
     assert written["document"]["presentationMode"] == mode
-    assert written["document"]["aiContent"] == ai_result
+    assert written["document"]["aiContent"] == (ai_result or {})
     assert len(ai_calls) == 1
     assert ai_calls[0][1:] == ("Test User", [], mode)
+
+
+def test_get_cv_regenerates_and_persists_legacy_null_ai(monkeypatch):
+    generated = {"hero": {"bio": "Regenerated"}}
+    document = {
+        "id": "Legacy12",
+        "sections": {
+            "raw_text": "Experience\nBuilt useful software",
+            "name": "Test User",
+            "items": [{"heading": "Experience", "body": "Built useful software"}],
+        },
+        "images": [],
+        "aiContent": None,
+        "presentationMode": "professional",
+    }
+    written = {}
+    calls = []
+    monkeypatch.setattr(
+        function_app,
+        "_blob_client",
+        lambda: SimpleNamespace(
+            read_json=lambda _path: document,
+            write_json=lambda path, payload: written.update(path=path, payload=payload.copy()),
+            generate_read_sas=lambda _path, minutes=10: "unused",
+        ),
+    )
+    monkeypatch.setattr(
+        function_app,
+        "generate_portfolio",
+        lambda *args: calls.append(args) or generated,
+    )
+
+    response = function_app.get_cv(SimpleNamespace(route_params={"cv_id": "Legacy12"}))
+    payload = json.loads(response.get_body())
+
+    assert response.status_code == 200
+    assert payload["aiContent"] == generated
+    assert calls[0][-1] == "professional"
+    assert written == {
+        "path": "Legacy12.json",
+        "payload": {**document, "aiContent": generated},
+    }
