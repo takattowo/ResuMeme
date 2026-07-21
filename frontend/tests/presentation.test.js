@@ -11,6 +11,7 @@ import {
   normalizePresentationMode,
   orderSections,
 } from '../js/presentation.js';
+import { expandSourceItems } from '../js/sourceSections.js';
 
 test('presentation choices and section orders are deterministic, valid, and diverse', () => {
   assert.deepEqual(MODE_VARIANTS, {
@@ -105,4 +106,37 @@ test('presentation choices and section orders are deterministic, valid, and dive
   }
   assert.deepEqual(PRESENTATION_MODES, ['modern', 'professional', 'chaos']);
   assert.equal(normalizePresentationMode('definitely-real'), 'chaos');
+});
+
+test('legacy source sections expand into readable portfolio cards without losing facts', () => {
+  const items = expandSourceItems([{
+    heading: 'Skills',
+    canonical: 'skills',
+    body: [
+      'Java (8 years)',
+      'Certifications (Professional Activities) Microsoft Azure AI Fundamentals',
+      'Professional Work Experience',
+      'DXC Technology',
+      'Account/Project Project name: FirstDoc 9.0 Start date: Jun 2019 End Date: Jun 2023',
+      'Role: Developer',
+      'Previous Relevant Work Experience',
+      'SutrixSolution 2017-2019',
+      'Account/Project Project name: Apollo',
+    ].join('\n'),
+  }]);
+
+  assert.deepEqual(items.map(({ heading, canonical }) => [heading, canonical]), [
+    ['Skills', 'skills'],
+    ['Certifications / Professional Activities', 'certifications'],
+    ['Professional experience', 'experience'],
+    ['FirstDoc 9.0', 'project'],
+    ['Previous experience', 'experience'],
+    ['Apollo', 'project'],
+  ]);
+  assert.match(items[1].body, /Microsoft Azure AI Fundamentals/);
+  assert.match(items[2].body, /DXC Technology/);
+  assert.match(items[3].body, /Start date: Jun 2019/);
+  assert.match(items[3].body, /Role: Developer/);
+  assert.match(items[4].body, /SutrixSolution 2017-2019/);
+  assert.equal(items[5].body, '');
 });

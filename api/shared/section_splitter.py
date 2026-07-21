@@ -3,14 +3,14 @@ from typing import TypedDict
 
 KNOWN_HEADINGS: dict[str, list[str]] = {
     "summary": ["summary", "profile", "objective", "about", "professional summary", "personal statement"],
-    "experience": ["experience", "employment", "work history", "professional experience", "work experience", "employment history", "career history"],
+    "experience": ["experience", "employment", "work history", "professional experience", "professional work experience", "previous relevant work experience", "work experience", "employment history", "career history", "key roles performed"],
     "skills": ["skills", "technical skills", "competencies", "core competencies", "key skills", "technologies", "tools", "tech stack"],
     "education": ["education", "academic background", "qualifications", "academic qualifications"],
     "certifications": ["certifications", "certificates", "licenses", "credentials"],
     "projects": ["projects", "personal projects", "personal project", "portfolio", "selected projects", "key projects", "side projects"],
     "freelance": ["freelance", "freelance work", "freelance experience", "freelance present", "consulting", "consulting experience"],
     "languages": ["languages", "language proficiency", "spoken languages"],
-    "awards": ["awards", "honors", "honours", "achievements", "accomplishments"],
+    "awards": ["awards", "honors", "honours", "achievements", "accomplishments", "work rewards/recognition"],
     "publications": ["publications", "papers"],
     "references": ["references"],
     "interests": ["interests", "hobbies", "activities"],
@@ -139,7 +139,7 @@ def _is_known_heading(line: str) -> tuple[bool, str, str]:
     text = line.strip().rstrip(":")
     if not text or len(text) > 50:
         return False, "", ""
-    cleaned = text.lower()
+    cleaned = re.sub(r"\s*/\s*", "/", re.sub(r"\s+", " ", text)).lower()
     for canonical, aliases in KNOWN_HEADINGS.items():
         for alias in aliases:
             if cleaned == alias:

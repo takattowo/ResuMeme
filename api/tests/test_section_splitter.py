@@ -167,3 +167,21 @@ def test_extracts_identity_from_header_with_contact_details():
         "canonical": "profile",
         "body": "London",
     }
+
+
+def test_splits_enterprise_cv_experience_headings():
+    result = split_sections(
+        "Jane Doe\nEngineer\nSkills\nJava\n"
+        "Key Roles Performed\nSoftware Developer\n"
+        "Professional Work Experience\nFirstDoc 9.0\n"
+        "Previous Relevant Work Experience\nSutrixSolution\n"
+        "Work Rewards / Recognition:\nN/A"
+    )
+
+    assert result["items"] == [
+        {"heading": "Skills", "canonical": "skills", "body": "Java"},
+        {"heading": "Key Roles Performed", "canonical": "experience", "body": "Software Developer"},
+        {"heading": "Professional Work Experience", "canonical": "experience", "body": "FirstDoc 9.0"},
+        {"heading": "Previous Relevant Work Experience", "canonical": "experience", "body": "SutrixSolution"},
+        {"heading": "Work Rewards / Recognition", "canonical": "awards", "body": "N/A"},
+    ]

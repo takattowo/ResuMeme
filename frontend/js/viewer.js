@@ -2,6 +2,7 @@ import { seededRng, pick, randFloat } from './rng.js';
 import { applyChaos } from './chaos/orchestrator.js';
 import { downloadAsHtml } from './download.js';
 import { getPresentation, normalizePresentationMode } from './presentation.js';
+import { expandSourceItems } from './sourceSections.js';
 
 const root = document.getElementById('cv-root');
 
@@ -89,6 +90,11 @@ function renderBaseDom(cv) {
     if (avatarUrl) {
       avatarEl.src = avatarUrl;
       avatarEl.alt = '';
+      avatarEl.addEventListener('load', () => {
+        if (avatarEl.naturalWidth / avatarEl.naturalHeight > 1.35) {
+          avatarEl.dataset.imageKind = 'logo';
+        }
+      }, { once: true });
     } else {
       avatarEl.textContent = avatarFallback;
     }
@@ -156,7 +162,7 @@ function appendRawText(text) {
 }
 
 function appendSourcePortfolio(sections) {
-  const items = Array.isArray(sections.items) ? sections.items : [];
+  const items = expandSourceItems(Array.isArray(sections.items) ? sections.items : []);
   const contacts = extractContacts(sections.raw_text || '');
   if (!items.length) {
     const fallbackText = withoutLeadingIdentity(
@@ -192,6 +198,7 @@ function makeSourceSection(item, index, omittedContacts = []) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
+  section.dataset.sourceSize = String(item.body || '').length > 900 ? 'long' : 'compact';
 
   const indexEl = document.createElement('span');
   indexEl.className = 'pf-source-index';
@@ -206,8 +213,11 @@ function makeSourceSection(item, index, omittedContacts = []) {
 
   const body = document.createElement('div');
   body.className = 'pf-source-body';
-  if (!appendSourceBody(body, item.body || '', omittedContacts)) return null;
-  section.appendChild(body);
+  if (appendSourceBody(body, item.body || '', omittedContacts)) {
+    section.appendChild(body);
+  } else if (item.canonical !== 'project') {
+    return null;
+  }
   return section;
 }
 
@@ -233,6 +243,26 @@ function appendSourceBody(container, text, omittedContacts = []) {
     }
 
     list = null;
+    const subheading = line.match(/^(.{2,48}):$/);
+    if (subheading) {
+      const heading = document.createElement('h3');
+      heading.className = 'pf-source-subheading';
+      heading.textContent = subheading[1];
+      container.appendChild(heading);
+      continue;
+    }
+
+    const detail = line.match(/^([A-Za-z][A-Za-z /+&-]{1,30}):\s+(.+)$/);
+    if (detail) {
+      const row = document.createElement('p');
+      row.className = 'pf-source-detail';
+      const label = document.createElement('strong');
+      label.textContent = `${detail[1]}:`;
+      row.append(label, document.createTextNode(` ${detail[2]}`));
+      container.appendChild(row);
+      continue;
+    }
+
     const paragraph = document.createElement('p');
     paragraph.textContent = line;
     container.appendChild(paragraph);
@@ -529,12 +559,15 @@ function makeIdentityCard(sections, aiIdentity, avatarEl, mode = 'chaos') {
   const sourceName = String(sections.name || '').trim();
   const sourceTitle = String(sections.title || '').trim();
   const heuristicName = looksLikePara(sourceName) ? '' : sourceName;
+  const sourceTitleLooksLikeLocation = /^(?:viet\s*nam|vietnam|(?:[\p{L}.'-]+\s+){1,4}city\s*,?\s*(?:viet\s*nam|vietnam))$/iu.test(sourceTitle);
   const aiName = (ai.name && ai.name.trim()) || '';
   // Reject AI name if it slipped a sigma founder title into the field.
   const safeAiName = looksLikeTitle(aiName) ? '' : aiName;
   const name = safeAiName || (mode === 'chaos' ? heuristicName : sourceName);
   const title = (ai.title && ai.title.trim())
-    || (mode === 'chaos' && looksLikePara(sourceTitle) ? '' : sourceTitle);
+    || ((mode === 'chaos' && looksLikePara(sourceTitle)) || sourceTitleLooksLikeLocation
+      ? ''
+      : sourceTitle);
   const tagline = (ai.tagline && ai.tagline.trim()) || '';
 
   if (name) {

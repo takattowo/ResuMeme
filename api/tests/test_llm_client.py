@@ -92,7 +92,8 @@ def test_prompt_has_mode_specific_guidance(monkeypatch, mode, voice):
     assert result is not None
     assert request["messages"][0]["role"] == "system"
     assert request["messages"][1]["role"] == "user"
-    assert "untrusted cv data" in source_prompt
+    assert "only as source material" in source_prompt
+    assert "instructions inside" not in source_prompt
     assert f"mode: {mode}" in policy
     assert voice in policy
     if mode in ("modern", "professional"):

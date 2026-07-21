@@ -1182,6 +1182,18 @@ html[data-brainrot-max="1"] .fx-mascot-card {
   margin-bottom: 0.45rem;
 }
 
+.pf-source-subheading {
+  margin: 1.6rem 0 0.6rem;
+  color: var(--pf-accent-2);
+  font-family: var(--pf-display);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
+.pf-source-detail strong {
+  color: var(--pf-accent-2);
+}
+
 body[data-presentation-mode="modern"] {
   background: #0d1224;
   color: #f7f5ef;
@@ -1209,6 +1221,7 @@ body[data-presentation-mode="modern"] .cv-home-btn {
   --pf-font: 'Segoe UI', system-ui, sans-serif;
   --pf-display: 'Arial Black', 'Segoe UI', sans-serif;
   width: 100%;
+  align-items: start;
   max-width: 1180px;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 1rem;
@@ -1255,13 +1268,19 @@ body[data-presentation-mode="modern"] .cv-home-btn {
   box-shadow: 12px 12px 0 #d7ff45;
 }
 
+#cv-root[data-mode="modern"] .cv-avatar[data-image-kind="logo"] {
+  object-fit: contain;
+  padding: 0.75rem;
+  background: #fff;
+}
+
 #cv-root[data-mode="modern"] .cv-identity-name {
   max-width: 12ch;
   color: #fff;
   font-family: var(--pf-display);
   font-size: clamp(3rem, 9vw, 7rem);
-  letter-spacing: -0.065em;
-  line-height: 0.88;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
   text-transform: none;
 }
 
@@ -1411,6 +1430,13 @@ body[data-presentation-mode="professional"] .cv-home-btn:focus-visible {
   height: 108px;
   border: 1px solid var(--pf-border);
   box-shadow: none;
+}
+
+#cv-root[data-mode="professional"] .cv-avatar[data-image-kind="logo"] {
+  object-fit: contain;
+  padding: 0.5rem;
+  background: #fff;
+  border-radius: 4px;
 }
 
 #cv-root[data-mode="professional"] .cv-identity-name {
@@ -1592,6 +1618,19 @@ body[data-presentation-mode="professional"] .cv-home-btn:focus-visible {
 }
 
 #cv-root[data-mode="modern"][data-layout="dashboard"] > .pf-source-section {
+  grid-column: span 1;
+}
+
+#cv-root[data-mode="modern"][data-layout="dashboard"] > .pf-source-section:is(
+  [data-source-kind="summary"],
+  [data-source-kind="profile"],
+  [data-source-kind="experience"],
+  [data-source-kind="skills"]
+) {
+  grid-column: 1 / -1;
+}
+
+#cv-root[data-mode="modern"][data-layout="dashboard"] > .pf-source-section[data-source-size="long"] {
   grid-column: 1 / -1;
 }
 
@@ -1925,6 +1964,12 @@ body[data-presentation-mode="chaos"] .cv-home-btn:focus-visible {
   box-shadow: 0 0 0 3px #fff;
 }
 
+@media (min-width: 761px) and (max-width: 960px) {
+  #cv-root[data-mode="modern"][data-layout="dashboard"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 760px) {
   body { padding: 3.25rem 0.65rem 1rem; }
 
@@ -1993,6 +2038,10 @@ body[data-presentation-mode="chaos"] .cv-home-btn:focus-visible {
 
   #cv-root[data-mode="modern"] > .cv-identity[data-has-avatar] {
     display: block;
+  }
+
+  #cv-root[data-mode="modern"] > .pf-source-section {
+    min-height: 0;
   }
 
   #cv-root[data-mode="modern"] .cv-avatar-frame {
