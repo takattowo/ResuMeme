@@ -11,7 +11,7 @@ import {
   normalizePresentationMode,
   orderSections,
 } from '../js/presentation.js';
-import { expandSourceItems } from '../js/sourceSections.js';
+import { expandSourceItems, selectPortfolioSourceItems } from '../js/sourceSections.js';
 
 test('presentation choices and section orders are deterministic, valid, and diverse', () => {
   assert.deepEqual(MODE_VARIANTS, {
@@ -139,4 +139,37 @@ test('legacy source sections expand into readable portfolio cards without losing
   assert.match(items[3].body, /Role: Developer/);
   assert.match(items[4].body, /SutrixSolution 2017-2019/);
   assert.equal(items[5].body, '');
+});
+
+test('AI hero consumes only an exact duplicate source summary', () => {
+  const source = [
+    { heading: 'Summary', canonical: 'summary', body: 'Product engineer.' },
+    { heading: 'Experience', canonical: 'experience', body: 'Built accessible products.' },
+    { heading: 'Design system', canonical: 'project', body: 'Role: Lead\nCreated reusable components.' },
+    { heading: 'Developer tools', canonical: 'project', body: 'Improved local workflows.' },
+    { heading: 'C++ platform', canonical: 'project', body: 'Built compiler tooling.' },
+    { heading: 'Skills', canonical: 'skills', body: 'JavaScript, CSS' },
+    { heading: 'Education', canonical: 'education', body: 'BSc Computer Science' },
+    { heading: 'Certifications', canonical: 'certifications', body: 'Azure Fundamentals' },
+    { heading: 'Community', canonical: 'volunteer', body: 'Mentored developers.' },
+  ];
+  const headings = (options) => selectPortfolioSourceItems(source, options)
+    .map(({ heading }) => heading);
+
+  assert.deepEqual(headings(), source.map(({ heading }) => heading));
+  assert.deepEqual(headings({ heroBio: 'A rewritten product engineering profile.' }),
+    source.map(({ heading }) => heading));
+  assert.deepEqual(headings({
+    heroBio: 'Product engineer.',
+    selectedWork: [{ title: 'Design system', role: 'Lead', summary: 'Created reusable components.' }],
+  }), [
+    'Experience', 'Design system', 'Developer tools', 'C++ platform', 'Skills', 'Education',
+    'Certifications', 'Community',
+  ]);
+  assert.ok(headings({
+    selectedWork: [{ title: 'C# platform', summary: 'Built compiler tooling.' }],
+  }).includes('C++ platform'));
+  assert.equal(selectPortfolioSourceItems([
+    { heading: 'Summary', canonical: 'summary', body: 'Revenue changed -10%.' },
+  ], { heroBio: 'Revenue changed 10%.' }).length, 1);
 });

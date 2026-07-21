@@ -656,7 +656,7 @@ html[data-brainrot-max="1"] .fx-mascot-card {
   font-family: monospace;
   font-size: 0.85rem;
   font-weight: 700;
-  margin-bottom: 0.75rem;
+  margin: 0 0 0.75rem;
   letter-spacing: 0.02em;
 }
 .pf-hero-body {
@@ -1951,6 +1951,253 @@ body[data-presentation-variant="technical"] .cv-home-btn {
   border-bottom: 1px solid #80c7ed;
 }
 
+/* Modern and Professional render as navigable portfolio sites, not card stacks. */
+#cv-root:is([data-mode="modern"], [data-mode="professional"]) > :is(.cv-identity, [data-cv-section]) {
+  scroll-margin-top: 6rem;
+}
+
+.pf-site-nav {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 100;
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-width: 0;
+  padding: 0.75rem 1rem;
+  font-family: var(--pf-font);
+}
+
+.pf-site-nav a {
+  color: inherit !important;
+  text-decoration: none;
+}
+
+.pf-site-brand {
+  overflow: hidden;
+  max-width: 22rem;
+  margin-left: 5rem;
+  font-family: var(--pf-display);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pf-site-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pf-site-links a {
+  padding-block: 0.25rem;
+  border-bottom: 2px solid transparent;
+}
+
+.pf-site-links a:hover {
+  border-color: var(--pf-accent);
+}
+
+.cv-identity-kicker {
+  margin-bottom: 1rem;
+  color: inherit;
+  font-family: var(--pf-font);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+#cv-root:is([data-mode="modern"], [data-mode="professional"]) > :is(.pf-hero-bio, .pf-work, .pf-testimonials, .pf-contact) {
+  grid-column: 1 / -1;
+}
+
+#cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-work-grid {
+  counter-reset: portfolio-work;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+#cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-work-card {
+  position: relative;
+  display: grid;
+  counter-increment: portfolio-work;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  padding: clamp(1.25rem, 3vw, 2rem) 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--pf-border);
+  border-radius: 0;
+}
+
+#cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-work-card::before {
+  grid-column: 1;
+  grid-row: 1 / span 6;
+  color: var(--pf-accent);
+  content: counter(portfolio-work, decimal-leading-zero);
+  font-family: var(--pf-display);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+#cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-work-card > * {
+  grid-column: 2;
+}
+
+#cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-work-title {
+  font-size: clamp(1.4rem, 3vw, 2.25rem);
+}
+
+#cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-contact {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.7fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem clamp(2rem, 6vw, 5rem);
+}
+
+#cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-contact > [data-cv-heading] {
+  grid-row: 1 / span 3;
+  margin: 0;
+  border: 0;
+  font-family: var(--pf-display);
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  letter-spacing: -0.045em;
+  line-height: 1;
+  text-transform: none;
+}
+
+#cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-contact > :not([data-cv-heading]) {
+  grid-column: 2;
+}
+
+#cv-root[data-mode="modern"] > .pf-site-nav {
+  color: #fff;
+  background: rgba(17, 22, 43, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(14px);
+}
+
+#cv-root[data-mode="modern"] .pf-site-links a:hover {
+  border-color: #d7ff45;
+}
+
+#cv-root[data-mode="modern"] > .cv-identity {
+  display: grid;
+  min-height: clamp(30rem, 68vh, 46rem);
+  align-content: end;
+}
+
+#cv-root[data-mode="modern"] > .pf-hero-bio {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.35fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  padding: clamp(2rem, 5vw, 4rem);
+}
+
+#cv-root[data-mode="modern"] .pf-hero-badge {
+  width: fit-content;
+  height: fit-content;
+  margin: 0;
+}
+
+#cv-root[data-mode="modern"] .pf-hero-body {
+  font-family: var(--pf-display);
+  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  font-style: normal;
+  line-height: 1.35;
+}
+
+#cv-root[data-mode="modern"] > .pf-work,
+#cv-root[data-mode="modern"] > .pf-testimonials,
+#cv-root[data-mode="modern"] > .pf-contact {
+  padding: clamp(2rem, 5vw, 4rem);
+}
+
+#cv-root[data-mode="modern"] > .pf-work > [data-cv-heading],
+#cv-root[data-mode="modern"] > .pf-testimonials > [data-cv-heading] {
+  margin-bottom: 2rem;
+  border: 0;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  letter-spacing: -0.045em;
+  line-height: 1;
+  text-transform: none;
+}
+
+#cv-root[data-mode="modern"] .pf-work-card {
+  grid-template-columns: 5rem minmax(0, 1fr) minmax(12rem, 0.45fr);
+  column-gap: 1.25rem;
+}
+
+#cv-root[data-mode="modern"] .pf-work-card > :is(.pf-work-head, .pf-work-title, .pf-work-role) {
+  grid-column: 2;
+}
+
+#cv-root[data-mode="modern"] .pf-work-card > :is(.pf-work-summary, .pf-work-metrics, .pf-work-tags) {
+  grid-column: 3;
+}
+
+#cv-root[data-mode="modern"] .pf-work-card > .pf-work-summary {
+  grid-row: 1 / span 2;
+}
+
+#cv-root[data-mode="professional"] > .pf-site-nav {
+  top: 0;
+  padding: 0.9rem clamp(1.5rem, 4vw, 3rem);
+  color: var(--pf-ink);
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid var(--pf-border);
+  backdrop-filter: blur(14px);
+}
+
+#cv-root[data-mode="professional"] > .pf-work,
+#cv-root[data-mode="professional"] > .pf-testimonials,
+#cv-root[data-mode="professional"] > .pf-contact {
+  padding: clamp(2rem, 5vw, 4rem);
+}
+
+#cv-root[data-mode="professional"] > .pf-hero-bio {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.3fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+}
+
+#cv-root[data-mode="professional"] .pf-hero-badge {
+  width: fit-content;
+  height: fit-content;
+  margin: 0;
+}
+
+#cv-root[data-mode="professional"] > .pf-stats {
+  grid-column: 1 / -1;
+}
+
+#cv-root[data-mode="professional"] .pf-stat {
+  text-align: left;
+}
+
+#cv-root[data-mode="professional"] .cv-actions {
+  margin: 0;
+}
+
+#cv-root[data-mode="professional"] .cv-actions::before {
+  align-self: center;
+  margin-right: auto;
+  color: var(--pf-muted);
+  content: 'Portfolio tools';
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .cv-home-btn:focus-visible,
 #cv-root :focus-visible {
   outline: 4px solid #00d5ff;
@@ -2070,6 +2317,99 @@ body[data-presentation-mode="chaos"] .cv-home-btn:focus-visible {
     right: 0.5rem;
     left: 0.5rem;
     max-width: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .pf-site-nav {
+    top: 0.4rem;
+    flex-wrap: wrap;
+    padding: 0.7rem 0.85rem;
+  }
+
+  .pf-site-brand {
+    max-width: 100%;
+  }
+
+  .pf-site-links {
+    width: 100%;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+  }
+
+  #cv-root[data-mode="modern"] > .pf-site-nav {
+    border-radius: 14px;
+  }
+
+  #cv-root[data-mode="modern"] > .cv-identity {
+    min-height: 28rem;
+  }
+
+  #cv-root[data-mode="modern"] > .pf-hero-bio,
+  #cv-root[data-mode="professional"] > .pf-hero-bio,
+  #cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-contact {
+    display: block;
+  }
+
+  #cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-work-card,
+  #cv-root[data-mode="modern"] .pf-work-card {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    column-gap: 0.5rem;
+  }
+
+  #cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-work-card > * {
+    grid-column: 2;
+    grid-row: auto;
+  }
+
+  #cv-root[data-mode="modern"] .pf-work-card > :is(
+    .pf-work-head,
+    .pf-work-title,
+    .pf-work-role,
+    .pf-work-summary,
+    .pf-work-metrics,
+    .pf-work-tags
+  ) {
+    grid-column: 2;
+    grid-row: auto;
+  }
+
+  #cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-contact > :not([data-cv-heading]) {
+    grid-column: auto;
+  }
+
+  #cv-root:is([data-mode="modern"], [data-mode="professional"]) .pf-contact > [data-cv-heading] {
+    margin-bottom: 1.5rem;
+  }
+
+  #cv-root[data-mode="professional"] .cv-actions::before {
+    width: 100%;
+    margin: 0 0 0.5rem;
+    text-align: center;
+  }
+}
+
+@media print {
+  body:is([data-presentation-mode="modern"], [data-presentation-mode="professional"]) {
+    padding: 0;
+    background: #fff !important;
+  }
+
+  body:is([data-presentation-mode="modern"], [data-presentation-mode="professional"]) .cv-home-btn,
+  body:is([data-presentation-mode="modern"], [data-presentation-mode="professional"]) .pf-site-nav,
+  body:is([data-presentation-mode="modern"], [data-presentation-mode="professional"]) .cv-actions {
+    display: none !important;
+  }
+
+  #cv-root:is([data-mode="modern"], [data-mode="professional"]) {
+    max-width: none;
+    border: 0;
+    box-shadow: none;
+  }
+
+  #cv-root:is([data-mode="modern"], [data-mode="professional"]) > * {
+    break-inside: avoid;
   }
 }
 

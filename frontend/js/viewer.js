@@ -2,7 +2,7 @@ import { seededRng, pick, randFloat } from './rng.js';
 import { applyChaos } from './chaos/orchestrator.js';
 import { downloadAsHtml } from './download.js';
 import { getPresentation, normalizePresentationMode } from './presentation.js';
-import { expandSourceItems } from './sourceSections.js';
+import { expandSourceItems, selectPortfolioSourceItems } from './sourceSections.js';
 
 const root = document.getElementById('cv-root');
 
@@ -30,6 +30,7 @@ async function load(id) {
   renderBaseDom(cv);
   const presentation = applyPresentation(id, cv.presentationMode);
   const candidateName = root.querySelector('.cv-identity-name')?.textContent.trim();
+  if (presentation.mode !== 'chaos') prependPortfolioNavigation(candidateName);
   const portfolioType = presentation.mode === 'chaos'
     ? 'ResuMeme'
     : `${presentation.mode[0].toUpperCase()}${presentation.mode.slice(1)} Portfolio`;
@@ -115,7 +116,10 @@ function renderBaseDom(cv) {
 
   if (!hasAiPortfolio) {
     if (mode === 'chaos') appendRawText(sections.raw_text || '');
-    else appendSourcePortfolio(sections);
+    else {
+      appendSourcePortfolio(sections);
+      appendSeriousContact(ai, sections, mode);
+    }
     appendActionBar(mode);
     return;
   }
@@ -133,20 +137,22 @@ function renderBaseDom(cv) {
     root.appendChild(makeSelectedWork(ai.selectedWork, mode));
   }
 
-  if (mode !== 'chaos' && !hasSelectedWork) {
-    appendSourcePortfolio(sections);
+  if (mode !== 'chaos') {
+    appendSourcePortfolio(sections, {
+      heroBio: ai.hero?.bio || '',
+    });
   }
 
   if (mode === 'chaos' && Array.isArray(ai.testimonials) && ai.testimonials.length) {
     root.appendChild(makeTestimonials(ai.testimonials, mode));
   }
 
-  const hasVisibleContact = ai.contact && (
-    ai.contact.blurb
-    || (mode === 'chaos' && (ai.contact.availability || ai.contact.rate))
-  );
+  const sourceText = sections.raw_text || '';
+  const hasVisibleContact = mode === 'chaos'
+    ? ai.contact && (ai.contact.blurb || ai.contact.availability || ai.contact.rate)
+    : ai.contact?.blurb || verifiedContacts(ai.identity, sourceText, mode).length;
   if (hasVisibleContact) {
-    root.appendChild(makeContact(ai.contact, ai.identity, mode, sections.raw_text || ''));
+    root.appendChild(makeContact(ai.contact || {}, ai.identity, mode, sourceText));
   }
 
   appendActionBar(mode);
@@ -161,10 +167,16 @@ function appendRawText(text) {
   root.appendChild(section);
 }
 
-function appendSourcePortfolio(sections) {
-  const items = expandSourceItems(Array.isArray(sections.items) ? sections.items : []);
+function appendSourcePortfolio(sections, options = {}) {
+  const sourceItems = Array.isArray(sections.items) ? sections.items : [];
+  const hasParsedItems = expandSourceItems(sourceItems).length > 0;
+  const items = selectPortfolioSourceItems(
+    sourceItems,
+    options
+  );
   const contacts = extractContacts(sections.raw_text || '');
   if (!items.length) {
+    if (hasParsedItems) return;
     const fallbackText = withoutLeadingIdentity(
       sections.raw_text || '',
       sections.name || '',
@@ -175,7 +187,7 @@ function appendSourcePortfolio(sections) {
       canonical: 'profile',
       body: fallbackText || 'No readable portfolio sections were found.',
     }, 0, contacts);
-    if (fallback) root.appendChild(fallback);
+    if (fallback) appendAnchoredSourceSection(fallback, 'about', 0);
     return;
   }
 
@@ -184,10 +196,31 @@ function appendSourcePortfolio(sections) {
     const omitted = item.canonical === 'profile' ? contacts : [];
     const section = makeSourceSection(item, rendered, omitted);
     if (section) {
-      root.appendChild(section);
+      appendAnchoredSourceSection(section, sourceGroup(item.canonical), rendered);
       rendered += 1;
     }
   }
+}
+
+function appendAnchoredSourceSection(section, anchor, index) {
+  section.id = document.getElementById(anchor) ? `${anchor}-${index + 1}` : anchor;
+  root.appendChild(section);
+}
+
+function sourceGroup(canonical) {
+  const kind = String(canonical || '').toLowerCase();
+  if (['summary', 'profile'].includes(kind)) return 'about';
+  if (['experience', 'projects', 'project', 'freelance'].includes(kind)) return 'work';
+  if (['skills', 'skill', 'technologies', 'technology', 'competencies', 'expertise'].includes(kind)) {
+    return 'expertise';
+  }
+  if ([
+    'education', 'certifications', 'certificates', 'awards', 'languages',
+    'publications', 'volunteer', 'volunteering',
+  ].includes(kind)) {
+    return 'background';
+  }
+  return 'details';
 }
 
 function makeSourceSection(item, index, omittedContacts = []) {
@@ -198,6 +231,7 @@ function makeSourceSection(item, index, omittedContacts = []) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
+  section.dataset.sourceGroup = sourceGroup(item.canonical);
   section.dataset.sourceSize = String(item.body || '').length > 900 ? 'long' : 'compact';
 
   const indexEl = document.createElement('span');
@@ -331,6 +365,7 @@ function makeHeroBio(bio, seedKey, mode) {
   const card = document.createElement('section');
   card.className = 'pf-hero-bio';
   card.dataset.cvSection = 'hero';
+  card.id = 'about';
 
   if (mode === 'chaos') {
     const localRng = seededRng((seedKey || '') + ':hero');
@@ -340,7 +375,7 @@ function makeHeroBio(bio, seedKey, mode) {
     card.style.setProperty('--hero-font', font);
   }
 
-  const badge = document.createElement('div');
+  const badge = document.createElement('h2');
   badge.className = 'pf-hero-badge';
   badge.textContent = mode === 'chaos'
     ? '✨ About the Founder'
@@ -360,6 +395,7 @@ function makeStatsStrip(stats, mode = 'chaos') {
   const section = document.createElement('section');
   section.className = 'pf-stats';
   section.dataset.cvSection = 'stats';
+  section.id = 'highlights';
 
   section.appendChild(makeHeading(mode === 'chaos' ? 'BY THE NUMBERS' : 'CAREER HIGHLIGHTS', 'stats'));
 
@@ -379,6 +415,7 @@ function makeSelectedWork(items, mode = 'chaos') {
   const section = document.createElement('section');
   section.className = 'pf-work';
   section.dataset.cvSection = 'experience';
+  section.id = 'work';
 
   section.appendChild(makeHeading(mode === 'chaos' ? 'SELECTED WORK' : 'SELECTED EXPERIENCE', 'experience'));
 
@@ -462,6 +499,7 @@ function makeTestimonials(items, mode = 'chaos') {
   const section = document.createElement('section');
   section.className = 'pf-testimonials';
   section.dataset.cvSection = 'testimonials';
+  section.id = 'recommendations';
 
   section.appendChild(makeHeading(mode === 'chaos' ? 'WHAT THEY SAY' : 'RECOMMENDATIONS', 'testimonials'));
 
@@ -492,6 +530,7 @@ function makeContact(contact, identity, mode = 'chaos', sourceText = '') {
   const section = document.createElement('section');
   section.className = 'pf-contact';
   section.dataset.cvSection = 'contact';
+  section.id = 'contact';
 
   section.appendChild(makeHeading(mode === 'chaos' ? 'LET’S COLLABORATE' : 'GET IN TOUCH', 'contact'));
 
@@ -542,6 +581,7 @@ function makeIdentityCard(sections, aiIdentity, avatarEl, mode = 'chaos') {
   const card = document.createElement('div');
   card.className = 'cv-identity';
   card.dataset.cvIdentity = '1';
+  card.id = 'top';
 
   if (avatarEl) {
     card.dataset.hasAvatar = '1';
@@ -569,6 +609,13 @@ function makeIdentityCard(sections, aiIdentity, avatarEl, mode = 'chaos') {
       ? ''
       : sourceTitle);
   const tagline = (ai.tagline && ai.tagline.trim()) || '';
+
+  if (mode !== 'chaos') {
+    const kicker = document.createElement('div');
+    kicker.className = 'cv-identity-kicker';
+    kicker.textContent = mode === 'modern' ? 'Selected profile' : 'Professional profile';
+    card.appendChild(kicker);
+  }
 
   if (name) {
     const el = document.createElement('h1');
@@ -609,6 +656,49 @@ function makeIdentityCard(sections, aiIdentity, avatarEl, mode = 'chaos') {
   }
 
   return card;
+}
+
+function appendSeriousContact(ai, sections, mode) {
+  const sourceText = sections.raw_text || '';
+  if (verifiedContacts(ai.identity, sourceText, mode).length) {
+    root.appendChild(makeContact({}, ai.identity, mode, sourceText));
+  }
+}
+
+function prependPortfolioNavigation(candidateName) {
+  const labels = new Map([
+    ['about', 'About'],
+    ['work', 'Work'],
+    ['expertise', 'Expertise'],
+    ['background', 'Background'],
+    ['contact', 'Contact'],
+  ]);
+  const targets = Array.from(root.querySelectorAll('#about, #work, #expertise, #background, #contact'))
+    .map(({ id }) => [id, labels.get(id)]);
+
+  const nav = document.createElement('nav');
+  nav.className = 'pf-site-nav';
+  nav.setAttribute('aria-label', 'Portfolio navigation');
+
+  const brand = document.createElement('a');
+  brand.className = 'pf-site-brand';
+  brand.href = '#top';
+  brand.textContent = candidateName || 'Portfolio';
+  nav.appendChild(brand);
+
+  if (targets.length) {
+    const links = document.createElement('div');
+    links.className = 'pf-site-links';
+    for (const [id, label] of targets) {
+      const link = document.createElement('a');
+      link.href = `#${id}`;
+      link.textContent = label;
+      links.appendChild(link);
+    }
+    nav.appendChild(links);
+  }
+
+  root.prepend(nav);
 }
 
 function contactHref(value) {

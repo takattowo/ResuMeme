@@ -65,3 +65,24 @@ export function expandSourceItems(items) {
 
   return expanded;
 }
+
+function comparableText(...values) {
+  return values
+    .flat(Infinity)
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function selectPortfolioSourceItems(items, { heroBio = '' } = {}) {
+  const heroText = comparableText(heroBio);
+
+  return expandSourceItems(items).filter((item) => {
+    const kind = String(item.canonical || '').toLowerCase();
+    if (heroText && ['summary', 'profile'].includes(kind)
+      && comparableText(item.body) === heroText) return false;
+    return true;
+  });
+}
