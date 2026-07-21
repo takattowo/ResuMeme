@@ -5,185 +5,256 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="only light">
   <meta name="darkreader-lock">
-  <title>ResuMeme: AI-Powered CV / Resume Enhancement | Beat Every ATS Filter</title>
-  <meta name="description" content="ResuMeme uses next-generation language models to rewrite your CV or resume so it never gets ignored, by recruiters or AI scanners.">
+  <title>ResuMeme | Executive-grade CV satire</title>
+  <meta name="description" content="Turn a real CV or resume into an absurdly overqualified AI founder portfolio. Free, fast, and professionally unserious.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/css/landing.css">
 </head>
-<body data-darkreader-ignore>
+<body class="landing-page" data-darkreader-ignore>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
   <nav class="navbar">
     <a href="/" class="logo">
       <span class="logo-mark">R</span>
       ResuMeme<span class="logo-tm">®</span>
     </a>
     <div class="nav-links">
-      <a href="#features">Features</a>
-      <a href="#how-it-works">How it works</a>
+      <a href="#features">Capabilities</a>
+      <a href="#how-it-works">Process</a>
       <a href="#pricing">Pricing</a>
+      <a href="#upload-zone" class="nav-cta">Start engagement</a>
     </div>
   </nav>
 
-  <header class="hero">
-    <div class="hero-inner">
-      <span class="hero-badge">⚡ Trusted by millions of professionals worldwide</span>
-      <h1>Your CV.<br><span class="grad">Redesigned by AI.</span><br>Never ignored again.</h1>
-      <p class="subhead">
-        ResuMeme uses next-generation neural language models to redesign your CV or resume so it beats every modern hiring filter, including AI screeners, ATS systems, and skim-reading recruiters.
-      </p>
-
-      <section id="upload-zone" class="dropzone" aria-label="CV upload">
-        <input type="file" id="file-input" accept=".pdf,.docx" hidden>
-        <div class="dropzone-inner">
-          <div class="dropzone-icon">📄</div>
-          <p class="dropzone-prompt">Drop your CV or resume here to get started</p>
-          <p class="dropzone-sub">PDF or DOCX, max 5MB</p>
-          <button type="button" id="browse-btn">Choose file</button>
+  <main id="main-content">
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="hero-masthead">
+          <span>Candidate transformation practice</span>
+          <span>Brief no. RM-2026</span>
         </div>
-      </section>
 
-      <section id="loading" hidden aria-live="polite">
-        <div class="spinner"></div>
-        <p id="loading-msg">Initializing enhancement…</p>
-      </section>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">Executive positioning, automated</p>
+            <h1>Your experience,<br><em>repositioned</em><br>beyond reason.</h1>
+            <p class="subhead">
+              Upload a real CV. In about 10-20 seconds, ResuMeme turns it into an aggressively overqualified founder portfolio built from AI, buzzwords, and unchecked confidence.
+            </p>
+            <p class="hero-disclaimer">
+              The output is satire, not career advice. Please do not submit it to anyone with hiring authority or a working sense of proportion.
+            </p>
 
-      <section id="error" hidden role="alert"></section>
+            <div class="hero-stats" role="list" aria-label="Service facts">
+              <div role="listitem"><strong>$0</strong><span>advisory fee</span></div>
+              <div role="listitem"><strong>10-20s</strong><span>typical turnaround</span></div>
+              <div role="listitem"><strong>30 days</strong><span>automatic retention</span></div>
+              <div role="listitem"><strong>0</strong><span>sales calls required</span></div>
+            </div>
+          </div>
 
-      <p class="hero-stats">
-        <span><strong>98.7%</strong> recruiter response rate</span>
-        <span class="stat-divider">•</span>
-        <span><strong>3.2×</strong> more interviews</span>
-        <span class="stat-divider">•</span>
-        <span><strong>14 days</strong> average time-to-offer</span>
-      </p>
+          <aside class="intake-panel" aria-labelledby="intake-title">
+            <div class="intake-head">
+              <div>
+                <span class="panel-label">Confidential-ish intake</span>
+                <h2 id="intake-title">Candidate transformation brief</h2>
+              </div>
+              <span class="status-chip">Recklessly approved</span>
+            </div>
 
-      <div class="activity-bar" aria-live="polite">
-        <span class="activity-pulse" aria-hidden="true"></span>
-        <span class="activity-label">Live</span>
-        <span class="activity-text" id="activity-ticker">Loading recent activity…</span>
+            <section id="upload-zone" class="dropzone" aria-label="CV upload">
+              <input type="file" id="file-input" accept=".pdf,.docx" hidden>
+              <div class="dropzone-inner">
+                <span class="dropzone-icon" aria-hidden="true">CV</span>
+                <p class="dropzone-prompt">Drop your current CV here</p>
+                <p class="dropzone-sub">PDF or DOCX, maximum 5 MiB</p>
+                <button type="button" id="browse-btn">Select document</button>
+              </div>
+            </section>
+
+            <section id="loading" hidden aria-live="polite">
+              <div class="spinner" aria-hidden="true"></div>
+              <p id="loading-msg">Initializing enhancement...</p>
+            </section>
+
+            <section id="error" hidden role="alert"></section>
+
+            <div class="intake-meta">
+              <span>No account</span>
+              <span>Public by link</span>
+              <span>Auto-deletes in 30 days</span>
+            </div>
+            <p class="intake-warning">Do not upload secrets. Anyone with the result link can view the CV contents.</p>
+          </aside>
+        </div>
+
+        <div class="activity-bar" aria-label="Satirical activity feed">
+          <span class="activity-pulse" aria-hidden="true"></span>
+          <span class="activity-label">Unverified market intelligence</span>
+          <span class="activity-text" id="activity-ticker">Calibrating stakeholder enthusiasm...</span>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <section id="features" class="features">
-    <h2 class="section-title">Engineered for the modern hiring funnel</h2>
-    <p class="section-sub">Every feature designed to ensure your application is read, ranked, and remembered.</p>
+    <section id="features" class="features">
+      <div class="section-shell">
+        <header class="section-heading">
+          <p class="section-index">01 / Capabilities</p>
+          <div>
+            <h2 class="section-title">A full-service transformation practice.<br>Without the full-service competence.</h2>
+            <p class="section-sub">Real parsing and AI generation, packaged with the institutional confidence of a consultancy nobody remembers hiring.</p>
+          </div>
+        </header>
 
-    <div class="feature-grid">
-      <article class="feature-card">
-        <div class="feature-icon">🛡️</div>
-        <h3>ATS-Bypass™ Technology</h3>
-        <p>Proprietary parsing models guarantee your CV is correctly indexed by every Applicant Tracking System used by Fortune 500 employers.</p>
-      </article>
-      <article class="feature-card">
-        <div class="feature-icon">🧠</div>
-        <h3>Neural Rewriting Engine</h3>
-        <p>Our LLM-powered engine rewrites each section to maximize keyword density without compromising professional readability.</p>
-      </article>
-      <article class="feature-card">
-        <div class="feature-icon">📈</div>
-        <h3>Recruiter-Validated</h3>
-        <p>Tuned on signal from 12,000+ HR professionals and benchmarked against thousands of successful placements.</p>
-      </article>
-      <article class="feature-card">
-        <div class="feature-icon">🎯</div>
-        <h3>Industry-Specific Tuning</h3>
-        <p>Tech, finance, healthcare, marketing: our models adapt to the language patterns of your target industry.</p>
-      </article>
-      <article class="feature-card">
-        <div class="feature-icon">🔒</div>
-        <h3>SOC 2 Type II</h3>
-        <p>Enterprise-grade encryption with 30-day automatic data retention and full GDPR/CCPA compliance.</p>
-      </article>
-      <article class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3>Twenty-Second Turnaround</h3>
-        <p>Full neural enhancement pipeline in 10-20 seconds, even for senior-level multi-page resumes. Slower than a microwave, faster than a recruiter replying.</p>
-      </article>
-    </div>
-  </section>
-
-  <section id="how-it-works" class="how-it-works">
-    <h2 class="section-title">Three steps to a recruiter-ready CV</h2>
-    <ol class="steps">
-      <li>
-        <span class="step-num">1</span>
-        <h3>Upload your existing CV</h3>
-        <p>Drop in any PDF or DOCX. We support every common format and template.</p>
-      </li>
-      <li>
-        <span class="step-num">2</span>
-        <h3>Our AI does the heavy lifting</h3>
-        <p>Neural rewriting, keyword optimization, and ATS-bypass formatting applied in seconds.</p>
-      </li>
-      <li>
-        <span class="step-num">3</span>
-        <h3>Download your enhanced CV</h3>
-        <p>Receive a recruiter-ready output, with a unique shareable link to send to hiring managers.</p>
-      </li>
-    </ol>
-  </section>
-
-  <section id="pricing" class="pricing">
-    <div class="pricing-inner">
-      <h2 class="section-title">Pricing</h2>
-      <p class="section-sub">No tiers. No paywall. Just enhancement.</p>
-
-      <div class="pricing-card">
-        <div class="pricing-badge">♾️ Forever</div>
-        <div class="pricing-headline">$0</div>
-        <div class="pricing-period">Completely free, until I run out of money.</div>
-
-        <ul class="pricing-features">
-          <li>✓ Unlimited CV enhancements</li>
-          <li>✓ Full neural rewriting engine</li>
-          <li>✓ ATS-Bypass™ technology included</li>
-          <li>✓ Unique shareable link per CV</li>
-          <li>✓ 30-day result hosting</li>
-          <li>✓ No credit card required</li>
-          <li>✓ No signup, no account</li>
-        </ul>
-
-        <a href="#upload-zone" class="pricing-cta">Get started, it's free</a>
-
-        <p class="pricing-fineprint">
-          Funded entirely by one founder's pocket money. When the money runs out, the AI features gracefully fall back to a basic version. The site itself stays online either way.
-        </p>
-        <p class="pricing-support">
-          Like the tool? <a href="https://ko-fi.com/takatto" target="_blank" rel="noopener">Buy me a coffee on Ko-fi ☕</a> to keep the AI running.
-        </p>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon">01</div>
+            <h3>Executive narrative inflation</h3>
+            <p>Transforms honest work history into board-ready mythology, then gives every routine task a strategic mandate.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">02</div>
+            <h3>ATS-Bypass™ theater</h3>
+            <p>A proprietary-sounding capability independently validated by nobody. The trademark is doing most of the work.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">03</div>
+            <h3>Founder-mode portfolio</h3>
+            <p>Recasts normal employment as a sequence of market-defining ventures, complete with vanity metrics and invented social proof.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">04</div>
+            <h3>Cross-industry buzzwords</h3>
+            <p>Synergy for finance. Disruption for technology. Patient-centered paradigm velocity for jobs we do not understand.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">05</div>
+            <h3>Shareable public result</h3>
+            <p>Each upload receives a unique public link. Anyone with it can view the result until it automatically expires after 30 days.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">06</div>
+            <h3>Twenty-second-ish turnaround</h3>
+            <p>Usually ready in 10-20 seconds. Slower than a microwave, faster than receiving useful recruiter feedback.</p>
+          </article>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="testimonials">
-    <h2 class="section-title">What professionals say</h2>
-    <div class="testi-grid" id="testi-grid"></div>
-  </section>
+    <section id="how-it-works" class="how-it-works">
+      <div class="section-shell process-layout">
+        <header class="process-intro">
+          <p class="section-index">02 / Methodology</p>
+          <h2 class="section-title">A rigorous three-step process.</h2>
+          <p class="section-sub">Rigorous in the sense that there are exactly three steps and we numbered all of them.</p>
+        </header>
+        <ol class="steps">
+          <li>
+            <span class="step-num">01</span>
+            <div>
+              <h3>Submit the source material</h3>
+              <p>Upload a PDF or DOCX up to 5 MiB. Only upload a CV you own or have permission to use.</p>
+            </div>
+            <span class="step-status">Input</span>
+          </li>
+          <li>
+            <span class="step-num">02</span>
+            <div>
+              <h3>Activate the confidence engine</h3>
+              <p>We parse the document and ask Azure OpenAI to produce a satirical founder narrative. If AI is unavailable, a simpler fallback still ships.</p>
+            </div>
+            <span class="step-status">Strategy</span>
+          </li>
+          <li>
+            <span class="step-num">03</span>
+            <div>
+              <h3>Review the reputational outcome</h3>
+              <p>Receive a chaotic portfolio at a unique public link. Download it, share it with friends, and keep it far from real applications.</p>
+            </div>
+            <span class="step-status">Deliverable</span>
+          </li>
+        </ol>
+      </div>
+    </section>
 
-  <section class="logos">
-    <p class="logos-label">Our users have joined teams at</p>
-    <div class="logo-strip">
-      <span>GOOGLE</span>
-      <span>META</span>
-      <span>AMAZON</span>
-      <span>DXC</span>
-      <span>STRIPE</span>
-      <span>NETFLIX</span>
-      <span>SHOPIFY</span>
-      <span>FIGMA</span>
-    </div>
-  </section>
+    <section id="pricing" class="pricing">
+      <div class="pricing-inner">
+        <header class="pricing-intro">
+          <p class="section-index">03 / Commercials</p>
+          <h2 class="section-title">Enterprise confidence.<br>Garage-sale economics.</h2>
+          <p class="section-sub">No tiers, procurement calls, or suspiciously urgent annual contracts.</p>
+        </header>
+
+        <div class="pricing-card">
+          <div class="pricing-summary">
+            <div class="pricing-badge">Founder-funded</div>
+            <div class="pricing-headline">$0</div>
+            <div class="pricing-period">per strategic transformation</div>
+            <a href="#upload-zone" class="pricing-cta">Commission your nonsense</a>
+          </div>
+
+          <div class="pricing-details">
+            <p class="pricing-details-label">Engagement includes</p>
+            <ul class="pricing-features">
+              <li>AI-generated corporate satire</li>
+              <li>A unique shareable link per CV</li>
+              <li>30-day automatic result hosting</li>
+              <li>No credit card, signup, or account</li>
+              <li>Graceful fallback if AI funding evaporates</li>
+              <li>Reasonable rate limits, because Azure invoices are real</li>
+            </ul>
+
+            <p class="pricing-fineprint">
+              Funded from one founder's pocket. If the AI budget runs out, the basic version keeps working and the board will call it a strategic simplification.
+            </p>
+            <p class="pricing-support">
+              Want to extend the runway? <a href="https://ko-fi.com/takatto" target="_blank" rel="noopener">Support the nonsense on Ko-fi</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="testimonials" aria-labelledby="testimonials-title">
+      <div class="section-shell">
+        <header class="section-heading">
+          <p class="section-index">04 / Social proof*</p>
+          <div>
+            <h2 class="section-title" id="testimonials-title">What professionals say</h2>
+            <p class="section-sub">Nine fresh endorsements on every visit. None verified, several concerning, all part of the joke.</p>
+          </div>
+        </header>
+        <div class="testi-grid" id="testi-grid"></div>
+        <p class="testi-disclaimer">*Names, roles, outcomes, and emotional breakthroughs are fictional. Confidence level: consulting-grade.</p>
+      </div>
+    </section>
+
+    <section class="logos" aria-label="Satirical company references">
+      <p class="logos-label">Organizations our confidence deck would like you to infer</p>
+      <div class="logo-strip">
+        <span>GOOGLE</span>
+        <span>META</span>
+        <span>AMAZON</span>
+        <span>DXC</span>
+        <span>STRIPE</span>
+        <span>NETFLIX</span>
+        <span>SHOPIFY</span>
+        <span>FIGMA</span>
+      </div>
+      <p class="logos-note">No affiliation, endorsement, placement data, or permission to make this look so official.</p>
+    </section>
+  </main>
 
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-brand">
         <strong>ResuMeme<span class="logo-tm">®</span></strong>
-        <p>AI-Powered CV Enhancement<br>© 2026 ResuMeme. All rights reserved.</p>
+        <p>Executive-grade CV satire<br>© 2026 ResuMeme. Some confidence reserved.</p>
         <a href="https://github.com/takattowo/ResuMeme" class="footer-source" target="_blank" rel="noopener">
           ⌘ Source code on GitHub
         </a>
         <a href="https://ko-fi.com/takatto" class="footer-kofi" target="_blank" rel="noopener">
-          ☕ Support on Ko-fi
+          Support on Ko-fi
         </a>
       </div>
       <div class="footer-cols">
@@ -206,7 +277,7 @@
       </div>
     </div>
     <p class="warning-fineprint">
-      ⚠ Anyone with the link to your enhanced CV can see its full contents, including any personal info on it. Links auto-expire after 30 days.
+      Anyone with the link to your ResuMeme can see its full contents, including personal information from the uploaded CV. Links automatically expire after 30 days.
     </p>
   </footer>
 

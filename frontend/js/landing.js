@@ -55,16 +55,16 @@ const TESTIMONIALS = [
 ];
 
 const ACTIVITY_FEED = [
-  '🟢 Sarah K. just enhanced her CV',
-  '🚀 Carlos R. landed 3 interviews this week',
-  '⚡ Priya R. got recruited by 2 unicorns',
-  '✨ Michael T. closed an offer in 14 hours',
-  '🎯 12,481 CVs enhanced today',
-  '🟢 Aisha R. bypassed 7 ATS systems',
-  '💼 Felix B. doubled his interview rate',
-  '🔥 Ravi K. got headhunted at lunch',
-  '🟢 Lin Z. logged into LinkedIn for the first time',
-  '⭐ Anna B. had her CV called "iconic"',
+  'The synergy committee has approved another adjective.',
+  'An ATS somewhere has requested paid leave.',
+  'Legal has classified "thought leader" as a controlled substance.',
+  'One routine spreadsheet is being repositioned as a platform.',
+  'A recruiter is pretending this all feels normal.',
+  'The board has promoted a bullet point to Chief Vision Officer.',
+  'Market intelligence confirms absolutely nothing.',
+  'Three KPIs were invented pending adult supervision.',
+  'A modest internship has entered its founder era.',
+  'Due diligence has been rescheduled until after lunch.',
 ];
 
 function shuffle(array) {

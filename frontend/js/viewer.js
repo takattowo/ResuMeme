@@ -1,6 +1,7 @@
 import { seededRng, pick, randFloat } from './rng.js';
 import { applyChaos } from './chaos/orchestrator.js';
 import { downloadAsHtml } from './download.js';
+import { getPresentation } from './presentation.js';
 
 const root = document.getElementById('cv-root');
 
@@ -26,6 +27,7 @@ async function load(id) {
   }
   const cv = await resp.json();
   renderBaseDom(cv);
+  applyPresentation(id);
   const rng = seededRng(id);
   const ctx = { cvId: id, rng, cv };
   applyChaos(rng, ctx);
@@ -38,6 +40,25 @@ function showFatal(message) {
   p.className = 'loading';
   p.textContent = message;
   root.appendChild(p);
+  root.removeAttribute('aria-busy');
+}
+
+function applyPresentation(id) {
+  const groups = new Map();
+  Array.from(root.children).forEach((node, index) => {
+    const section = node.dataset.cvIdentity ? 'identity' : node.dataset.cvSection || `other:${index}`;
+    if (!groups.has(section)) groups.set(section, []);
+    groups.get(section).push(node);
+  });
+
+  const presentation = getPresentation(id, Array.from(groups.keys()));
+  root.dataset.theme = presentation.theme;
+  root.dataset.style = presentation.style;
+  root.dataset.layout = presentation.layout;
+
+  for (const section of presentation.sectionOrder) {
+    for (const node of groups.get(section)) root.appendChild(node);
+  }
 }
 
 function renderBaseDom(cv) {
@@ -368,7 +389,7 @@ function makeIdentityCard(sections, aiIdentity, avatarEl) {
   const tagline = (ai.tagline && ai.tagline.trim()) || '';
 
   if (name) {
-    const el = document.createElement('div');
+    const el = document.createElement('h1');
     el.className = 'cv-identity-name';
     el.dataset.cvSpecial = 'name';
     el.textContent = name;
