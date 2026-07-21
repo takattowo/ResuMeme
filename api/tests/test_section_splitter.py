@@ -133,3 +133,37 @@ def test_does_not_treat_short_title_as_heading():
     assert result["title"] == "Dev"
     by_canon = _by_canon(result)
     assert "She writes code" in by_canon["summary"]
+
+
+def test_preserves_text_before_first_section_heading():
+    text = (
+        "Jane Doe\nEngineer\n"
+        "Email: jane@example.com | +1 (555) 123-4567\n"
+        "2019-2024\nBuilds reliable systems.\n\n"
+        "Experience\nAcme, 2022-2025\n"
+    )
+    result = split_sections(text)
+    assert [item["canonical"] for item in result["items"]] == ["profile", "experience"]
+    assert result["items"][0] == {
+        "heading": "Profile",
+        "canonical": "profile",
+        "body": (
+            "Email: jane@example.com | +1 (555) 123-4567\n"
+            "2019-2024\nBuilds reliable systems."
+        ),
+    }
+    assert result["items"][1]["body"] == "Acme, 2022-2025"
+
+
+def test_extracts_identity_from_header_with_contact_details():
+    result = split_sections(
+        "Jane Doe | Senior Engineer | London | jane@example.com\n\n"
+        "Experience\nBuilt reliable systems."
+    )
+    assert result["name"] == "Jane Doe"
+    assert result["title"] == "Senior Engineer"
+    assert result["items"][0] == {
+        "heading": "Profile",
+        "canonical": "profile",
+        "body": "London",
+    }

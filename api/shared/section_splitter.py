@@ -35,6 +35,14 @@ _BULLET_RE = re.compile(r"^\s*([-•*►▪◦‣⋅▸·]|\d+[.\)])\s")
 _SENTENCE_END = re.compile(r"[.!?][\"')\]]?\s*$")
 _HEADING_CHARS = re.compile(r"^[A-Za-z][A-Za-z\s/&\-:]*$")
 
+_EMAIL_RE = re.compile(r"[\w.+-]+@[\w.-]+\.\w+")
+_LINK_RE = re.compile(
+    r"(?:https?://|www\.|(?:linkedin\.com|github\.com)/)", re.IGNORECASE
+)
+_PHONE_LABEL_RE = re.compile(r"\b(?:phone|mobile|tel)\s*:?", re.IGNORECASE)
+_PHONE_CANDIDATE_RE = re.compile(r"\+?\d[\d\s().\-]{5,}\d")
+_YEAR_RANGE_RE = re.compile(r"(?:19|20)\d{2}\s*[-–]\s*(?:19|20)\d{2}")
+
 # Page header / footer patterns that should never be treated as the candidate's name.
 _PAGE_CHROME_PATTERNS = [
     re.compile(r"\bpage\s+\d+\s+of\s+\d+\b", re.IGNORECASE),
@@ -42,9 +50,6 @@ _PAGE_CHROME_PATTERNS = [
     re.compile(r"\bconfidential(?:\s+information)?\b", re.IGNORECASE),
     re.compile(r"\b(?:curriculum\s+vitae|resum[eé])\b", re.IGNORECASE),
     re.compile(r"^\s*\d{1,3}\s*$"),
-    re.compile(r"^\s*https?://", re.IGNORECASE),
-    re.compile(r"^\s*[\w.+-]+@[\w.-]+\.\w+\s*$"),
-    re.compile(r"^\s*\+?[\d\s().\-]{7,}\s*$"),
 ]
 
 # Lines bearing a corporate suffix are branding, not a person's name.
@@ -79,6 +84,41 @@ def _is_page_chrome(line: str) -> bool:
     if _COMPANY_SUFFIX_RE.search(s):
         return True
     return False
+
+
+def _is_contact_line(line: str) -> bool:
+    if _EMAIL_RE.search(line) or _LINK_RE.search(line):
+        return True
+    if _YEAR_RANGE_RE.fullmatch(line.strip()):
+        return False
+    phone = _PHONE_CANDIDATE_RE.search(line)
+    if not phone:
+        return False
+    digits = re.sub(r"\D", "", phone.group())
+    return len(digits) >= 9 or (
+        len(digits) >= 7
+        and (phone.group().lstrip().startswith("+") or _PHONE_LABEL_RE.search(line))
+    )
+
+
+def _identity_parts(line: str) -> list[str]:
+    return [
+        candidate
+        for part in re.split(r"\s*[|•·]\s*", line)
+        if (candidate := part.strip()) and not _is_contact_line(candidate)
+    ]
+
+
+def _header_details(lines: list[str], name: str, title: str) -> list[str]:
+    identity = {value.casefold() for value in (name, title) if value}
+    return [
+        part
+        for line in lines
+        for part in _identity_parts(line)
+        if part.casefold() not in identity
+        and not _is_page_chrome(part)
+        and not _is_known_heading(part)[0]
+    ]
 
 
 def _looks_like_human_name(line: str) -> bool:
@@ -149,6 +189,7 @@ def _merge_wrapped_lines(text: str) -> str:
 
     Keeps the line break when:
     - line is empty
+    - either line is contact information
     - next line starts with a bullet/number marker
     - next line is a section heading
     - previous line ended with sentence-final punctuation
@@ -170,6 +211,10 @@ def _merge_wrapped_lines(text: str) -> str:
         prev = out[-1]
         is_new_paragraph = (
             _BULLET_RE.match(line)
+            or _is_contact_line(line)
+            or _is_contact_line(prev)
+            or _YEAR_RANGE_RE.fullmatch(line)
+            or _YEAR_RANGE_RE.fullmatch(prev)
             or _SENTENCE_END.search(prev)
             or _detect_heading(line)[0]
             or _detect_heading(prev)[0]
@@ -202,13 +247,16 @@ def _extract_name_and_title(
 
     plausible: list[tuple[int, str]] = []
     first_heading_idx: int | None = None
-    for i, ln in non_empty:
-        if _is_page_chrome(ln):
-            continue
-        if _is_known_heading(ln)[0]:
-            first_heading_idx = i
+    for i, raw_line in non_empty:
+        for ln in _identity_parts(raw_line):
+            if _is_page_chrome(ln):
+                continue
+            if _is_known_heading(ln)[0]:
+                first_heading_idx = i
+                break
+            plausible.append((i, ln))
+        if first_heading_idx is not None:
             break
-        plausible.append((i, ln))
 
     if not plausible:
         name = fb if _looks_like_human_name(fb) else fb
@@ -240,6 +288,7 @@ def _extract_name_and_title(
 def split_sections(text: str, fallback_name: str = "") -> Sections:
     raw_lines = text.splitlines()
     name, title, start = _extract_name_and_title(raw_lines, fallback_name)
+    header_details = _header_details(raw_lines[:start], name, title)
 
     body_text = "\n".join(raw_lines[start:])
     merged_body = _merge_wrapped_lines(body_text)
@@ -249,6 +298,7 @@ def split_sections(text: str, fallback_name: str = "") -> Sections:
     current_heading = ""
     current_canonical = ""
     current_body: list[str] = []
+    preamble_body: list[str] = header_details
     prev_blank = True  # treat start of body as "after a blank line"
 
     def flush() -> None:
@@ -281,12 +331,20 @@ def split_sections(text: str, fallback_name: str = "") -> Sections:
                 canon, display = generic_canon, generic_display
 
         if is_h:
+            if not current_heading and preamble_body:
+                items.append({
+                    "heading": "Profile",
+                    "canonical": "profile",
+                    "body": "\n".join(preamble_body),
+                })
             flush()
             current_heading = display
             current_canonical = canon
             current_body = []
         elif current_heading:
             current_body.append(stripped)
+        else:
+            preamble_body.append(stripped)
         prev_blank = False
 
     flush()

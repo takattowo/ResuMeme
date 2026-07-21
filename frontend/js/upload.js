@@ -4,7 +4,7 @@ const ACCEPTED = ['application/pdf',
 
 // Each message has a duration roughly matching the real backend phase it
 // covers: parsing is fast, the AI call is the bulk of the latency.
-const LOADING_MESSAGES = [
+const CHAOS_LOADING_MESSAGES = [
   { text: 'Uploading your CV securely…', ms: 1500 },
   { text: 'Parsing document structure…', ms: 1800 },
   { text: 'Detecting sections and skills…', ms: 1800 },
@@ -17,12 +17,26 @@ const LOADING_MESSAGES = [
   { text: 'Finalizing your enhanced CV…', ms: 2500 },
 ];
 
+const PORTFOLIO_LOADING_MESSAGES = [
+  { text: 'Uploading your CV securely…', ms: 1000 },
+  { text: 'Parsing document structure…', ms: 1200 },
+  { text: 'Arranging your experience and projects…', ms: 1200 },
+  { text: 'Polishing the portfolio layout…', ms: 1200 },
+  { text: 'Publishing your shareable page…', ms: 1200 },
+];
+
 const dropzone = document.getElementById('upload-zone');
 const fileInput = document.getElementById('file-input');
 const browseBtn = document.getElementById('browse-btn');
 const loadingEl = document.getElementById('loading');
 const loadingMsg = document.getElementById('loading-msg');
 const errorEl = document.getElementById('error');
+const styleDialog = document.getElementById('style-dialog');
+const styleForm = document.getElementById('style-form');
+const styleCancel = document.getElementById('style-cancel');
+const selectedFile = document.getElementById('selected-file');
+let pendingFile = null;
+let loadingTimer = null;
 
 browseBtn.addEventListener('click', () => fileInput.click());
 dropzone.addEventListener('click', (e) => {
@@ -52,6 +66,26 @@ fileInput.addEventListener('change', (e) => {
   if (file) handleFile(file);
 });
 
+styleForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (!pendingFile) return;
+  const file = pendingFile;
+  const mode = new FormData(styleForm).get('presentation') || 'modern';
+  pendingFile = null;
+  styleDialog.close();
+  uploadFile(file, mode);
+});
+
+styleCancel.addEventListener('click', () => {
+  pendingFile = null;
+  styleDialog.close();
+  fileInput.click();
+});
+
+styleDialog.addEventListener('cancel', () => {
+  pendingFile = null;
+});
+
 // When the browser restores this page from the back/forward cache
 // (e.g. user clicks Back from /cv/{id}), the dropzone is still hidden
 // from the previous upload. Reset UI state and clear the input so the
@@ -62,12 +96,17 @@ window.addEventListener('pageshow', (e) => {
   loadingEl.hidden = true;
   clearError();
   fileInput.value = '';
+  styleForm.reset();
+  pendingFile = null;
+  stopLoadingMessages();
+  if (styleDialog.open) styleDialog.close();
 });
 
 function showError(message) {
   errorEl.textContent = message;
   errorEl.hidden = false;
   loadingEl.hidden = true;
+  stopLoadingMessages();
 }
 
 function clearError() {
@@ -75,7 +114,7 @@ function clearError() {
   errorEl.textContent = '';
 }
 
-async function handleFile(file) {
+function handleFile(file) {
   clearError();
 
   if (file.size > MAX_BYTES) {
@@ -92,12 +131,20 @@ async function handleFile(file) {
     return;
   }
 
+  pendingFile = file;
+  styleForm.reset();
+  selectedFile.textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)} MiB`;
+  if (!styleDialog.open) styleDialog.showModal();
+}
+
+async function uploadFile(file, mode) {
   dropzone.hidden = true;
   loadingEl.hidden = false;
-  cycleLoadingMessages();
+  cycleLoadingMessages(mode);
 
   const fd = new FormData();
   fd.append('file', file);
+  fd.append('presentation', mode);
 
   try {
     const resp = await fetch('/api/upload', { method: 'POST', body: fd });
@@ -106,6 +153,7 @@ async function handleFile(file) {
       throw new Error(body.message || 'Enhancement failed. Recruiters definitely noticed.');
     }
     const { url } = await resp.json();
+    stopLoadingMessages();
     window.location.href = url;
   } catch (err) {
     dropzone.hidden = false;
@@ -113,14 +161,21 @@ async function handleFile(file) {
   }
 }
 
-function cycleLoadingMessages() {
+function cycleLoadingMessages(mode) {
+  stopLoadingMessages();
+  const messages = mode === 'chaos' ? CHAOS_LOADING_MESSAGES : PORTFOLIO_LOADING_MESSAGES;
   let i = 0;
-  loadingMsg.textContent = LOADING_MESSAGES[0].text;
+  loadingMsg.textContent = messages[0].text;
   const tick = () => {
     if (loadingEl.hidden) return;
-    i = (i + 1) % LOADING_MESSAGES.length;
-    loadingMsg.textContent = LOADING_MESSAGES[i].text;
-    setTimeout(tick, LOADING_MESSAGES[i].ms);
+    i = (i + 1) % messages.length;
+    loadingMsg.textContent = messages[i].text;
+    loadingTimer = setTimeout(tick, messages[i].ms);
   };
-  setTimeout(tick, LOADING_MESSAGES[0].ms);
+  loadingTimer = setTimeout(tick, messages[0].ms);
+}
+
+function stopLoadingMessages() {
+  if (loadingTimer !== null) clearTimeout(loadingTimer);
+  loadingTimer = null;
 }

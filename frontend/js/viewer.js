@@ -1,7 +1,7 @@
 import { seededRng, pick, randFloat } from './rng.js';
 import { applyChaos } from './chaos/orchestrator.js';
 import { downloadAsHtml } from './download.js';
-import { getPresentation } from './presentation.js';
+import { getPresentation, normalizePresentationMode } from './presentation.js';
 
 const root = document.getElementById('cv-root');
 
@@ -27,10 +27,10 @@ async function load(id) {
   }
   const cv = await resp.json();
   renderBaseDom(cv);
-  applyPresentation(id);
+  const presentation = applyPresentation(id, cv.presentationMode);
   const rng = seededRng(id);
-  const ctx = { cvId: id, rng, cv };
-  applyChaos(rng, ctx);
+  const ctx = { cvId: id, rng, cv, presentationMode: presentation.mode };
+  if (presentation.mode === 'chaos') applyChaos(rng, ctx);
   root.removeAttribute('aria-busy');
 }
 
@@ -43,7 +43,7 @@ function showFatal(message) {
   root.removeAttribute('aria-busy');
 }
 
-function applyPresentation(id) {
+function applyPresentation(id, mode) {
   const groups = new Map();
   Array.from(root.children).forEach((node, index) => {
     const section = node.dataset.cvIdentity ? 'identity' : node.dataset.cvSection || `other:${index}`;
@@ -51,39 +51,57 @@ function applyPresentation(id) {
     groups.get(section).push(node);
   });
 
-  const presentation = getPresentation(id, Array.from(groups.keys()));
+  const presentation = getPresentation(id, Array.from(groups.keys()), mode);
+  root.dataset.mode = presentation.mode;
   root.dataset.theme = presentation.theme;
   root.dataset.style = presentation.style;
   root.dataset.layout = presentation.layout;
+  document.body.dataset.presentationMode = presentation.mode;
 
   for (const section of presentation.sectionOrder) {
     for (const node of groups.get(section)) root.appendChild(node);
   }
+  return presentation;
 }
 
 function renderBaseDom(cv) {
   const sections = cv.sections || {};
   const ai = cv.aiContent || {};
+  const mode = normalizePresentationMode(cv.presentationMode);
 
   const avatarUrl = (cv.imageUrls || [])[0] || null;
   const avatarFallback = pick(seededRng(cv.id + ':emoji'), ['🤡', '👽', '💀', '🦄', '👻']);
 
   root.replaceChildren();
 
-  const avatarEl = document.createElement(avatarUrl ? 'img' : 'div');
-  avatarEl.dataset.cvAvatar = '1';
-  avatarEl.classList.add('cv-avatar');
-  if (avatarUrl) {
-    avatarEl.src = avatarUrl;
-    avatarEl.alt = '';
-  } else {
-    avatarEl.textContent = avatarFallback;
+  let avatarEl = null;
+  if (avatarUrl || mode === 'chaos') {
+    avatarEl = document.createElement(avatarUrl ? 'img' : 'div');
+    avatarEl.dataset.cvAvatar = '1';
+    avatarEl.classList.add('cv-avatar');
+    if (avatarUrl) {
+      avatarEl.src = avatarUrl;
+      avatarEl.alt = '';
+    } else {
+      avatarEl.textContent = avatarFallback;
+    }
   }
 
-  root.appendChild(makeIdentityCard(sections, ai.identity, avatarEl));
+  root.appendChild(makeIdentityCard(
+    sections,
+    mode === 'chaos' ? ai.identity : null,
+    avatarEl,
+    mode
+  ));
+
+  if (mode !== 'chaos') {
+    appendSourcePortfolio(sections);
+    appendActionBar(mode);
+    return;
+  }
 
   if (ai.hero && ai.hero.bio) {
-    root.appendChild(makeHeroBio(ai.hero.bio, cv.id));
+    root.appendChild(makeHeroBio(ai.hero.bio, cv.id, mode));
   }
 
   if (Array.isArray(ai.stats) && ai.stats.length) {
@@ -107,7 +125,7 @@ function renderBaseDom(cv) {
     appendRawText(sections.raw_text || '');
   }
 
-  appendActionBar();
+  appendActionBar(mode);
 }
 
 function appendRawText(text) {
@@ -117,6 +135,112 @@ function appendRawText(text) {
     if (line.trim()) section.appendChild(makeText(line));
   }
   root.appendChild(section);
+}
+
+function appendSourcePortfolio(sections) {
+  const items = Array.isArray(sections.items) ? sections.items : [];
+  const contacts = extractContacts(sections.raw_text || '');
+  if (!items.length) {
+    const fallbackText = withoutLeadingIdentity(
+      sections.raw_text || '',
+      sections.name || '',
+      sections.title || ''
+    );
+    const fallback = makeSourceSection({
+      heading: 'Profile',
+      canonical: 'profile',
+      body: fallbackText || 'No readable portfolio sections were found.',
+    }, 0, contacts);
+    if (fallback) root.appendChild(fallback);
+    return;
+  }
+
+  let rendered = 0;
+  for (const item of items) {
+    const omitted = item.canonical === 'profile' ? contacts : [];
+    const section = makeSourceSection(item, rendered, omitted);
+    if (section) {
+      root.appendChild(section);
+      rendered += 1;
+    }
+  }
+}
+
+function makeSourceSection(item, index, omittedContacts = []) {
+  const section = document.createElement('section');
+  section.className = 'pf-source-section';
+  section.dataset.cvSection = 'portfolio';
+  section.dataset.sourceKind = String(item.canonical || 'section')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+  const indexEl = document.createElement('span');
+  indexEl.className = 'pf-source-index';
+  indexEl.setAttribute('aria-hidden', 'true');
+  indexEl.textContent = String(index + 1).padStart(2, '0');
+  section.appendChild(indexEl);
+
+  const heading = document.createElement('h2');
+  heading.className = 'pf-source-heading';
+  heading.textContent = item.heading || 'Details';
+  section.appendChild(heading);
+
+  const body = document.createElement('div');
+  body.className = 'pf-source-body';
+  if (!appendSourceBody(body, item.body || '', omittedContacts)) return null;
+  section.appendChild(body);
+  return section;
+}
+
+function appendSourceBody(container, text, omittedContacts = []) {
+  let list = null;
+  for (const rawLine of text.split('\n')) {
+    const line = withoutRenderedContacts(rawLine, omittedContacts);
+    if (!line) {
+      list = null;
+      continue;
+    }
+
+    const bullet = line.match(/^[-*•▪◦‣⋅▸]\s+(.*)$/);
+    if (bullet) {
+      if (!list) {
+        list = document.createElement('ul');
+        container.appendChild(list);
+      }
+      const item = document.createElement('li');
+      item.textContent = bullet[1];
+      list.appendChild(item);
+      continue;
+    }
+
+    list = null;
+    const paragraph = document.createElement('p');
+    paragraph.textContent = line;
+    container.appendChild(paragraph);
+  }
+  return container.childElementCount > 0;
+}
+
+function withoutRenderedContacts(rawLine, contacts) {
+  let line = rawLine.trim();
+  for (const contact of contacts) {
+    line = line.split(contact).join('');
+  }
+  line = line.replace(/^[\s|•·,;:/-]+|[\s|•·,;:/-]+$/g, '').trim();
+  const remainder = line
+    .replace(/\b(?:email|phone|mobile|tel|linkedin|github)\s*:?/gi, '')
+    .replace(/[\s|•·,;:/-]/g, '');
+  return remainder ? line : '';
+}
+
+function withoutLeadingIdentity(text, name, title) {
+  const identity = [name, title].filter(Boolean);
+  let inspected = 0;
+  return text.split('\n').map((line) => {
+    if (!line.trim() || inspected++ >= 3) return line;
+    return withoutRenderedContacts(line, identity);
+  }).join('\n');
 }
 
 function makeHeading(text, key) {
@@ -155,15 +279,18 @@ const HERO_FONTS = [
   '"Trebuchet MS", "Lucida Sans", sans-serif',
 ];
 
-function makeHeroBio(bio, seedKey) {
+function makeHeroBio(bio, seedKey, mode) {
   const card = document.createElement('section');
   card.className = 'pf-hero-bio';
   card.dataset.cvSection = 'hero';
 
-  const localRng = seededRng((seedKey || '') + ':hero');
-  const font = pick(localRng, HERO_FONTS);
-  const tilt = randFloat(localRng, -1.5, 1.5);
-  card.style.transform = `rotate(${tilt}deg)`;
+  if (mode === 'chaos') {
+    const localRng = seededRng((seedKey || '') + ':hero');
+    const font = pick(localRng, HERO_FONTS);
+    const tilt = randFloat(localRng, -1.5, 1.5);
+    card.style.transform = `rotate(${tilt}deg)`;
+    card.style.setProperty('--hero-font', font);
+  }
 
   const badge = document.createElement('div');
   badge.className = 'pf-hero-badge';
@@ -172,7 +299,7 @@ function makeHeroBio(bio, seedKey) {
 
   const body = document.createElement('p');
   body.className = 'pf-hero-body';
-  body.style.fontFamily = font;
+  if (mode === 'chaos') body.style.fontFamily = 'var(--hero-font)';
   body.appendChild(splitWords(bio));
   card.appendChild(body);
 
@@ -363,12 +490,13 @@ function makeContact(contact, identity) {
   return section;
 }
 
-function makeIdentityCard(sections, aiIdentity, avatarEl) {
+function makeIdentityCard(sections, aiIdentity, avatarEl, mode = 'chaos') {
   const card = document.createElement('div');
   card.className = 'cv-identity';
   card.dataset.cvIdentity = '1';
 
   if (avatarEl) {
+    card.dataset.hasAvatar = '1';
     const frame = document.createElement('div');
     frame.className = 'cv-avatar-frame';
     frame.appendChild(avatarEl);
@@ -380,12 +508,16 @@ function makeIdentityCard(sections, aiIdentity, avatarEl) {
   const looksLikeTitle = (s) =>
     !!s && /^(?:founder|co-?founder|ceo|cto|cfo|coo|cmo|chief|vp|svp|evp|head\s+of|lead|director|principal|architect\s+of|president|managing|partner)\b/i.test(s.trim());
 
-  const heuristicName = looksLikePara(sections.name) ? '' : sections.name;
+  const sourceName = String(sections.name || '').trim();
+  const sourceTitle = String(sections.title || '').trim();
+  const heuristicName = looksLikePara(sourceName) ? '' : sourceName;
   const aiName = (ai.name && ai.name.trim()) || '';
   // Reject AI name if it slipped a sigma founder title into the field.
   const safeAiName = looksLikeTitle(aiName) ? '' : aiName;
-  const name = safeAiName || heuristicName || '';
-  const title = (ai.title && ai.title.trim()) || (looksLikePara(sections.title) ? '' : sections.title) || '';
+  const name = mode === 'chaos' ? safeAiName || heuristicName : sourceName;
+  const title = mode === 'chaos'
+    ? (ai.title && ai.title.trim()) || (looksLikePara(sourceTitle) ? '' : sourceTitle)
+    : sourceTitle;
   const tagline = (ai.tagline && ai.tagline.trim()) || '';
 
   if (name) {
@@ -417,10 +549,12 @@ function makeIdentityCard(sections, aiIdentity, avatarEl) {
     const strip = document.createElement('div');
     strip.className = 'cv-identity-contacts';
     for (const item of contacts) {
-      const chip = document.createElement('span');
+      const href = mode === 'chaos' ? '' : contactHref(item);
+      const chip = document.createElement(href ? 'a' : 'span');
       chip.className = 'cv-contact-chip';
       chip.dataset.cvSpecial = 'contact';
       chip.textContent = item;
+      if (href) chip.href = href;
       strip.appendChild(chip);
     }
     card.appendChild(strip);
@@ -429,41 +563,65 @@ function makeIdentityCard(sections, aiIdentity, avatarEl) {
   return card;
 }
 
+function contactHref(value) {
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return `mailto:${value}`;
+  if (/^(?:https?:\/\/|www\.|(?:linkedin\.com|github\.com)\/)[^\s]+$/i.test(value)) {
+    return /^https?:\/\//i.test(value) ? value : `https://${value}`;
+  }
+  const digits = value.replace(/\D/g, '');
+  return digits.length >= 7 ? `tel:${value.replace(/[^+\d]/g, '')}` : '';
+}
+
 function extractContacts(text) {
   const hits = [];
   const seen = new Set();
-  const patterns = [
-    /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
-    /(?:\+\d{1,3}[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}/g,
-    /(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+/gi,
-    /(?:https?:\/\/)?(?:www\.)?github\.com\/[a-zA-Z0-9-]+/gi,
-  ];
-  for (const pat of patterns) {
-    const matches = text.match(pat) || [];
-    for (const m of matches) {
-      const trimmed = m.trim();
-      if (trimmed.length >= 7 && !seen.has(trimmed.toLowerCase())) {
-        seen.add(trimmed.toLowerCase());
-        hits.push(trimmed);
-      }
+  const add = (value) => {
+    const trimmed = value.trim().replace(/[.,;:]+$/, '');
+    const key = trimmed.toLowerCase();
+    if (trimmed.length >= 7 && !seen.has(key)) {
+      seen.add(key);
+      hits.push(trimmed);
     }
+  };
+
+  for (const email of text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []) {
+    add(email);
+  }
+
+  const withoutUrlsOrEmails = text.replace(
+    /(?:https?:\/\/|www\.|(?:linkedin\.com|github\.com)\/)[^\s|<>()]+/gi,
+    ' '
+  ).replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, ' ');
+  for (const candidate of withoutUrlsOrEmails.match(/(?:\+?\d|\(\d)[\d \t().-]{5,}\d/g) || []) {
+    const digits = candidate.replace(/\D/g, '');
+    const isYearRange = /(?:19|20)\d{2}\s*[-–]\s*(?:19|20)\d{2}/.test(candidate);
+    if (!isYearRange && digits.length <= 15 && (
+      digits.length >= 9 || (digits.length >= 7 && candidate.trim().startsWith('+'))
+    )) add(candidate);
+  }
+
+  for (const url of text.match(
+    /(?:https?:\/\/|www\.|(?:linkedin\.com|github\.com)\/)[^\s|<>()]+/gi
+  ) || []) {
+    add(url);
   }
   return hits.slice(0, 6);
 }
 
-function appendActionBar() {
+function appendActionBar(mode) {
   const bar = document.createElement('div');
   bar.className = 'cv-actions';
   bar.dataset.cvSection = 'actions';
 
   const dl = document.createElement('button');
   dl.id = 'btn-download';
-  dl.textContent = '✨ Download Portfolio ✨';
+  dl.textContent = mode === 'chaos' ? '✨ Download Portfolio ✨' : 'Download portfolio';
   bar.appendChild(dl);
 
   const sh = document.createElement('button');
   sh.id = 'btn-share';
-  sh.textContent = '📋 Copy share link';
+  sh.dataset.defaultLabel = mode === 'chaos' ? '📋 Copy share link' : 'Copy share link';
+  sh.textContent = sh.dataset.defaultLabel;
   bar.appendChild(sh);
 
   root.appendChild(bar);
@@ -478,7 +636,7 @@ document.addEventListener('click', async (e) => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       e.target.textContent = '✓ Copied!';
-      setTimeout(() => { e.target.textContent = '📋 Copy share link'; }, 1500);
+      setTimeout(() => { e.target.textContent = e.target.dataset.defaultLabel; }, 1500);
     } catch {
       e.target.textContent = 'Copy failed, select URL manually';
     }

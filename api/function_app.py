@@ -19,6 +19,7 @@ MAX_BYTES = 5 * 1024 * 1024
 PDF_MAGIC = b"%PDF-"
 DOCX_MAGIC = b"PK\x03\x04"
 ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{6,16}$")
+PRESENTATION_MODES = frozenset({"modern", "professional", "chaos"})
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -54,6 +55,12 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
     if not files or "file" not in files:
         return _json_error(400, "no_file", "No file uploaded.")
 
+    presentation_mode = _presentation_mode(
+        getattr(req, "form", {}).get("presentation")
+    )
+    if presentation_mode is None:
+        return _json_error(400, "bad_presentation", "Choose a valid presentation mode.")
+
     body = files["file"].read()
 
     if len(body) == 0:
@@ -82,12 +89,14 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
 
     sections = split_sections(parsed["raw_text"], fallback_name=parsed.get("author", ""))
 
-    # AI is best-effort. None = fall back to generic frontend content.
-    ai_content = generate_roasts(
-        parsed["raw_text"],
-        sections.get("name", ""),
-        sections.get("items", []),
-    )
+    # Real portfolio modes use parsed source text; only explicit chaos needs AI.
+    ai_content = None
+    if presentation_mode == "chaos":
+        ai_content = generate_roasts(
+            parsed["raw_text"],
+            sections.get("name", ""),
+            sections.get("items", []),
+        )
 
     cv_id = generate_id()
     image_paths: list[str] = []
@@ -104,6 +113,7 @@ def upload(req: func.HttpRequest) -> func.HttpResponse:
         "images": image_paths,
         "ownerId": None,
         "aiContent": ai_content,
+        "presentationMode": presentation_mode,
     }
     bc.write_json(f"{cv_id}.json", document)
 
@@ -148,6 +158,13 @@ def _detect_kind(data: bytes) -> str | None:
     if data.startswith(DOCX_MAGIC):
         return "docx"
     return None
+
+
+def _presentation_mode(value: object) -> str | None:
+    if value is None:
+        return None
+    mode = str(value).strip().lower()
+    return mode if mode in PRESENTATION_MODES else None
 
 
 def _content_type_for_image(data: bytes) -> str:

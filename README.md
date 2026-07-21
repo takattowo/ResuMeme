@@ -2,14 +2,14 @@
 
 Live on: https://black-desert-031be090f.7.azurestaticapps.net/
 
-A small project for learning the Azure stack end-to-end: Static Web Apps, managed Functions, Blob Storage, and Azure OpenAI. The app takes an uploaded CV (PDF or DOCX), parses it, runs the content through an LLM, and renders the result back to the user. It deploys via `azd` to a Free-tier SWA + Standard LRS storage account, and authenticates to Azure OpenAI with a key.
+A small project for learning the Azure stack end-to-end: Static Web Apps, managed Functions, Blob Storage, and Azure OpenAI. The app parses an uploaded CV (PDF or DOCX), then builds a source-faithful Modern or Professional portfolio, or sends it through an LLM for the original satirical Chaos mode. It deploys via `azd` to a Free-tier SWA + Standard LRS storage account, and authenticates to Azure OpenAI with a key when Chaos is used.
 
 ## Stack
 
 - **Frontend:** vanilla HTML/CSS/JS on Azure Static Web Apps
 - **Backend:** Python 3.11 Azure Functions (managed by SWA, Python v2 programming model)
 - **Storage:** Azure Blob Storage with a 30-day lifecycle policy
-- **AI:** Azure OpenAI (model deployment configurable via env var)
+- **AI:** Azure OpenAI for opt-in Chaos mode (model deployment configurable via env var)
 - **IaC:** Bicep, deployed with the Azure Developer CLI (`azd`)
 
 ## Local development
@@ -53,14 +53,21 @@ Open `http://localhost:4280`.
 cd api
 $env:PYTHONPATH = "$PWD"   # PowerShell; bash: export PYTHONPATH=$PWD
 .venv\Scripts\python.exe -m pytest tests/ -v
+
+# Frontend presentation rules
+cd ..
+npm test
 ```
 
-50 tests across 9 modules, including blob client and rate limiter integration with Azurite.
+57 backend tests across 9 modules, including blob client and rate limiter integration with Azurite.
 
 ## Manual smoke test checklist
 
 - [ ] Upload a PDF, renders the result at `/cv/<id>`
 - [ ] Upload a DOCX, renders the result at `/cv/<id>`
+- [ ] File selection opens the Modern / Professional / Chaos dialog
+- [ ] Modern and Professional preserve source CV content without chaos effects
+- [ ] Chaos generates satirical content and applies seeded effects
 - [ ] Reload the result page, output is identical (deterministic per id)
 - [ ] Copy the share link, opens correctly in incognito
 - [ ] File over 5MB rejected with a friendly error
@@ -79,7 +86,7 @@ azd deploy                # subsequent code-only deploys
 
 Run `azd provision` after changes under `infra/`; `azd deploy` only updates app code.
 
-After `azd up`, set the four AI env vars on the deployed SWA via the portal (Static Web App, Environment variables):
+To enable Chaos mode, set the four AI env vars on the deployed SWA via the portal (Static Web App, Environment variables). Modern and Professional work without them:
 
 | Name | Example value |
 |---|---|
