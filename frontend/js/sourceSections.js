@@ -76,10 +76,12 @@ function comparableText(...values) {
     .trim();
 }
 
-export function selectPortfolioSourceItems(items, { heroBio = '' } = {}) {
+export function selectPortfolioSourceItems(items, { heroBio = '', enhancedItems = [] } = {}) {
   const heroText = comparableText(heroBio);
+  const enhanced = Array.isArray(enhancedItems) ? expandSourceItems(enhancedItems) : [];
+  const portfolioItems = enhanced.length ? enhanced : expandSourceItems(items);
 
-  return expandSourceItems(items).filter((item) => {
+  return portfolioItems.filter((item) => {
     const kind = String(item.canonical || '').toLowerCase();
     if (heroText && ['summary', 'profile'].includes(kind)
       && comparableText(item.body) === heroText) return false;

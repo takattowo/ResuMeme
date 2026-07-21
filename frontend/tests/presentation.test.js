@@ -173,3 +173,19 @@ test('AI hero consumes only an exact duplicate source summary', () => {
     { heading: 'Summary', canonical: 'summary', body: 'Revenue changed -10%.' },
   ], { heroBio: 'Revenue changed 10%.' }).length, 1);
 });
+
+test('enhanced portfolio sections replace source sections with source fallback', () => {
+  const source = [
+    { heading: 'Skills', canonical: 'skills', body: 'Java, Flutter' },
+    { heading: 'Education', canonical: 'education', body: 'Computer Science' },
+  ];
+  const enhanced = [{
+    heading: 'Engineering expertise',
+    canonical: 'expertise',
+    body: 'Builds resilient Java services and expressive Flutter applications.',
+  }];
+
+  assert.deepEqual(selectPortfolioSourceItems(source, { enhancedItems: enhanced }), enhanced);
+  assert.deepEqual(selectPortfolioSourceItems(source, { enhancedItems: [] }), source);
+  assert.deepEqual(selectPortfolioSourceItems(source, { enhancedItems: [{}] }), source);
+});

@@ -152,7 +152,9 @@ async function uploadFile(file, mode) {
     const resp = await fetch('/api/upload', { method: 'POST', body: fd });
     if (!resp.ok) {
       const body = await resp.json().catch(() => ({}));
-      throw new Error(body.message || 'Enhancement failed. Recruiters definitely noticed.');
+      throw new Error(
+        body.message || `Enhancement service returned HTTP ${resp.status}. Please try again shortly.`,
+      );
     }
     const { url } = await resp.json();
     stopLoadingMessages();

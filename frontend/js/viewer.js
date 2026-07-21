@@ -112,6 +112,7 @@ function renderBaseDom(cv) {
     ai.hero?.bio
     || (Array.isArray(ai.stats) && ai.stats.length)
     || (Array.isArray(ai.selectedWork) && ai.selectedWork.length)
+    || (Array.isArray(ai.sections) && ai.sections.length)
   );
 
   if (!hasAiPortfolio) {
@@ -140,6 +141,7 @@ function renderBaseDom(cv) {
   if (mode !== 'chaos') {
     appendSourcePortfolio(sections, {
       heroBio: ai.hero?.bio || '',
+      enhancedItems: ai.sections,
     });
   }
 
@@ -169,7 +171,8 @@ function appendRawText(text) {
 
 function appendSourcePortfolio(sections, options = {}) {
   const sourceItems = Array.isArray(sections.items) ? sections.items : [];
-  const hasParsedItems = expandSourceItems(sourceItems).length > 0;
+  const enhancedItems = Array.isArray(options.enhancedItems) ? options.enhancedItems : [];
+  const hasParsedItems = expandSourceItems([...enhancedItems, ...sourceItems]).length > 0;
   const items = selectPortfolioSourceItems(
     sourceItems,
     options
@@ -417,7 +420,14 @@ function makeSelectedWork(items, mode = 'chaos') {
   section.dataset.cvSection = 'experience';
   section.id = 'work';
 
-  section.appendChild(makeHeading(mode === 'chaos' ? 'SELECTED WORK' : 'SELECTED EXPERIENCE', 'experience'));
+  const hasConcepts = mode !== 'chaos' && items.some((item) => (
+    String(item.client || '').toLowerCase() === 'concept project'
+    || String(item.title || '').toLowerCase().startsWith('concept:')
+  ));
+  const heading = mode === 'chaos'
+    ? 'SELECTED WORK'
+    : hasConcepts ? 'SELECTED WORK & CONCEPTS' : 'SELECTED EXPERIENCE';
+  section.appendChild(makeHeading(heading, 'experience'));
 
   const grid = document.createElement('div');
   grid.className = 'pf-work-grid';

@@ -2,14 +2,14 @@
 
 Live on: https://black-desert-031be090f.7.azurestaticapps.net/
 
-A small project for learning the Azure stack end-to-end: Static Web Apps, managed Functions, Blob Storage, and Azure OpenAI. The app parses an uploaded CV (PDF or DOCX), then uses mode-specific AI generation to build a source-grounded Modern or Professional portfolio or the original satirical Chaos result. Each approach selects a deterministic visual variant from its own theme and layout pool. It deploys via `azd` to a Free-tier SWA + Standard LRS storage account.
+A small project for learning the Azure stack end-to-end: Static Web Apps, managed Functions, Blob Storage, and Azure OpenAI. The app parses an uploaded CV (PDF or DOCX), then uses mode-specific AI generation to build a fact-inspired Modern or Professional portfolio or the original satirical Chaos result. Sparse serious-mode CVs may gain clearly labeled concept projects based on the candidate's real skills. Each approach selects a deterministic visual variant from its own theme and layout pool. It deploys via `azd` to a Free-tier SWA + Standard LRS storage account.
 
 ## Stack
 
 - **Frontend:** vanilla HTML/CSS/JS on Azure Static Web Apps
 - **Backend:** Python 3.11 Azure Functions (managed by SWA, Python v2 programming model)
 - **Storage:** Azure Blob Storage with a 30-day lifecycle policy
-- **AI:** Azure OpenAI with factual Modern/Professional prompts and a satirical Chaos prompt
+- **AI:** Azure OpenAI with grounded but creative Modern/Professional prompts and a fully satirical Chaos prompt
 - **IaC:** Bicep, deployed with the Azure Developer CLI (`azd`)
 
 ## Local development
@@ -66,7 +66,7 @@ npm test
 - [ ] Upload a PDF, renders the result at `/cv/<id>`
 - [ ] Upload a DOCX, renders the result at `/cv/<id>`
 - [ ] File selection opens the Modern / Professional / Chaos dialog
-- [ ] Modern and Professional produce source-grounded AI content without chaos effects
+- [ ] Modern and Professional preserve real facts and clearly label any invented concept projects
 - [ ] Fixed sample IDs cover all four seeded Modern and Professional variants
 - [ ] Chaos generates satirical content and applies seeded effects
 - [ ] Reload the result page, output is identical (deterministic per id)
@@ -87,14 +87,13 @@ azd deploy                # subsequent code-only deploys
 
 Run `azd provision` after changes under `infra/`; `azd deploy` only updates app code.
 
-Set the four AI environment variables on the deployed SWA via the portal (Static Web App, Environment variables). All three presentation modes use them:
+Set the three AI environment variables on the deployed SWA via the portal (Static Web App, Environment variables). All three presentation modes use them:
 
 | Name | Example value |
 |---|---|
 | `AZURE_OPENAI_ENDPOINT` | `https://<your-resource>.cognitiveservices.azure.com/` |
 | `AZURE_OPENAI_KEY` | (paste the key) |
-| `AZURE_OPENAI_DEPLOYMENT` | `gpt-4o-mini` (or whatever deployment name you created) |
-| `AZURE_OPENAI_API_VERSION` | `2025-04-01-preview` |
+| `AZURE_OPENAI_DEPLOYMENT` | `gpt-5-nano` (or whatever deployment name you created) |
 
 The SWA also expects a deployment token in the GitHub repo secret `AZURE_STATIC_WEB_APPS_API_TOKEN` so the GitHub Actions workflow can auto-deploy on `main` pushes. Get the token from the portal under "Manage deployment token" and add it under Settings → Secrets and variables → Actions.
 
