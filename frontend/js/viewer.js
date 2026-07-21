@@ -28,6 +28,11 @@ async function load(id) {
   const cv = await resp.json();
   renderBaseDom(cv);
   const presentation = applyPresentation(id, cv.presentationMode);
+  const candidateName = root.querySelector('.cv-identity-name')?.textContent.trim();
+  const portfolioType = presentation.mode === 'chaos'
+    ? 'ResuMeme'
+    : `${presentation.mode[0].toUpperCase()}${presentation.mode.slice(1)} Portfolio`;
+  if (candidateName) document.title = `${candidateName.slice(0, 100)} | ${portfolioType}`;
   const rng = seededRng(id);
   const ctx = { cvId: id, rng, cv, presentationMode: presentation.mode };
   if (presentation.mode === 'chaos') applyChaos(rng, ctx);
